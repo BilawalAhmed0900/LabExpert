@@ -1,10 +1,11 @@
+import 'dart:io';
+
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:lab_expert/Constants/constants.dart';
 import 'package:lab_expert/Singletons/global_hive_box.dart';
 import 'package:lab_expert/scaffolds/login_scaffold.dart';
 
-import '../Functions/cast_array.dart';
 import '../Functions/show_alert_box.dart';
 import '../Functions/username_password_sha256.dart';
 import '../HiveEntities/user.dart';
@@ -27,6 +28,10 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
   void initState() {
     super.initState();
     value = widget.firstPageNoUser;
+
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      DesktopWindow.setWindowSize(const Size(720, 505));
+    }
   }
 
   @override
@@ -35,25 +40,31 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Registration"),
+      ),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Row(
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.7,
+                  width: screenWidth * 0.20,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: const [
-                      Text("Please register a user who will administer the database"),
+                      Text("Username: "),
+                      Text("Password: "),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: screenHeight * 0.7,
+                  width: screenWidth * 0.75,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      const Text("Username:   "),
                       SizedBox(
                         width: screenWidth * 0.75,
                         child: TextField(
@@ -62,12 +73,6 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
                           maxLength: 32,
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Password:   "),
                       SizedBox(
                         width: screenWidth * 0.75,
                         child: TextField(
@@ -80,29 +85,14 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Make Admin:   "),
-                      Checkbox(
-                        value: value,
-                        onChanged: (bool? newValue) => setState(() {
-                          value = (widget.firstPageNoUser) ? true : newValue!;
-                        }),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _registerUser(context);
-                      },
-                      child: const Text("Register"),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _registerUser(context);
+              },
+              child: const Text("Register"),
             ),
           ],
         ),

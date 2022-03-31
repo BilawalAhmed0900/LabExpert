@@ -35,7 +35,7 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
     super.initState();
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 1020));
+      DesktopWindow.setWindowSize(const Size(820, 980));
     }
 
     currentDT = DateTime.now();
@@ -59,144 +59,260 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Add Patient"),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            Column(
+            Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Id:   "),
+                SizedBox(
+                  height: screenHeight * 0.85,
+                  width: screenWidth * 0.20,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: const [
+                      Text("Id: "),
+                      Text("Name: "),
+                      Text("Gender: "),
+                      Text("Age: "),
+                      Text("Sample: "),
+                      Text("Lab Number: "),
+                      Text("Date Added: "),
+                      Text("Referred By: "),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.85,
+                  width: screenWidth * 0.75,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
                     SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        textAlign: TextAlign.right,
-                        controller: idController,
-                        readOnly: true,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Name:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        textAlign: TextAlign.right,
-                        controller: nameController,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Gender:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        textAlign: TextAlign.right,
-                        controller: genderController,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Age:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        textAlign: TextAlign.right,
-                        keyboardType: TextInputType.number,
-                        controller: ageController,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Sample:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        controller: sampleController,
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Lab Number:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        controller: labNumberController,
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Date Added:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        controller: dateAddedController,
-                        textAlign: TextAlign.right,
-                        readOnly: true,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Referred By:   "),
-                    SizedBox(
-                      width: screenWidth * 0.75,
-                      child: TextField(
-                        maxLength: 32,
-                        textAlign: TextAlign.right,
-                        controller: referredByController,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        _addPatient(context);
-                      },
-                      child: const Text("Add Patient"),
-                    ),
-                  ],
-                ),
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        textAlign: TextAlign.right,
+                                        controller: idController,
+                                        readOnly: true,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        textAlign: TextAlign.right,
+                                        controller: nameController,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        textAlign: TextAlign.right,
+                                        controller: genderController,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        textAlign: TextAlign.right,
+                                        keyboardType: TextInputType.number,
+                                        controller: ageController,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        controller: sampleController,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        controller: labNumberController,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        controller: dateAddedController,
+                                        textAlign: TextAlign.right,
+                                        readOnly: true,
+                                      ),
+                                    ),
+                  SizedBox(
+                                      width: screenWidth * 0.75,
+                                      child: TextField(
+                                        maxLength: 32,
+                                        controller: referredByController,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    ),
+
+                    ],
+                  ),
+                )
               ],
             ),
+      ElevatedButton(
+                          onPressed: () {
+                            _addPatient(context);
+                          },
+                          child: const Text("Add Patient"),
+                        ),
           ],
         ),
       ),
     );
+
+    // return Scaffold(
+    //   appBar: AppBar(),
+    //   body: SafeArea(
+    //     child: Column(
+    //       children: [
+    //         Column(
+    //           children: [
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Id:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     textAlign: TextAlign.right,
+    //                     controller: idController,
+    //                     readOnly: true,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Name:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     textAlign: TextAlign.right,
+    //                     controller: nameController,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Gender:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     textAlign: TextAlign.right,
+    //                     controller: genderController,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Age:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     textAlign: TextAlign.right,
+    //                     keyboardType: TextInputType.number,
+    //                     controller: ageController,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Sample:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     controller: sampleController,
+    //                     textAlign: TextAlign.right,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Lab Number:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     controller: labNumberController,
+    //                     textAlign: TextAlign.right,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Date Added:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     controller: dateAddedController,
+    //                     textAlign: TextAlign.right,
+    //                     readOnly: true,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 const Text("Referred By:   "),
+    //                 SizedBox(
+    //                   width: screenWidth * 0.75,
+    //                   child: TextField(
+    //                     maxLength: 32,
+    //                     textAlign: TextAlign.right,
+    //                     controller: referredByController,
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 ElevatedButton(
+    //                   onPressed: () {
+    //                     _addPatient(context);
+    //                   },
+    //                   child: const Text("Add Patient"),
+    //                 ),
+    //               ],
+    //             ),
+    //           ],
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 
   void _addPatient(BuildContext context) async {

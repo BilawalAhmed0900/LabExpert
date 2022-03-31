@@ -16,10 +16,11 @@ import 'Singletons/global_hive_box.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    await DesktopWindow.setMaxWindowSize(const Size(1280, 720));
-    await DesktopWindow.setMinWindowSize(const Size(720, 505));
-  }
+  // if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  //   //await DesktopWindow.setMaxWindowSize(const Size(1920, 1080));
+  //   //await DesktopWindow.setMinWindowSize(const Size(720, 505));
+  //   await DesktopWindow.setWindowSize(const Size(720, 505));
+  // }
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
   await Hive.initFlutter();
@@ -51,7 +52,7 @@ void main() async {
     ));
   } else {
     runApp(MaterialApp(
-      home: LoginScaffold(),
+      home: const LoginScaffold(),
       theme: ThemeData.dark(),
     ));
   }
