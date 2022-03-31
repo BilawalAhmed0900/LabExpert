@@ -90,85 +90,84 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                    SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        textAlign: TextAlign.right,
-                                        controller: idController,
-                                        readOnly: true,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        textAlign: TextAlign.right,
-                                        controller: nameController,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        textAlign: TextAlign.right,
-                                        controller: genderController,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        textAlign: TextAlign.right,
-                                        keyboardType: TextInputType.number,
-                                        controller: ageController,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        controller: sampleController,
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        controller: labNumberController,
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        controller: dateAddedController,
-                                        textAlign: TextAlign.right,
-                                        readOnly: true,
-                                      ),
-                                    ),
-                  SizedBox(
-                                      width: screenWidth * 0.75,
-                                      child: TextField(
-                                        maxLength: 32,
-                                        controller: referredByController,
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          textAlign: TextAlign.right,
+                          controller: idController,
+                          readOnly: true,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          textAlign: TextAlign.right,
+                          controller: nameController,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          textAlign: TextAlign.right,
+                          controller: genderController,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          textAlign: TextAlign.right,
+                          keyboardType: TextInputType.number,
+                          controller: ageController,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          controller: sampleController,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          controller: labNumberController,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          controller: dateAddedController,
+                          textAlign: TextAlign.right,
+                          readOnly: true,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          controller: referredByController,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
                     ],
                   ),
                 )
               ],
             ),
-      ElevatedButton(
-                          onPressed: () {
-                            _addPatient(context);
-                          },
-                          child: const Text("Add Patient"),
-                        ),
+            ElevatedButton(
+              onPressed: () {
+                _addPatient(context);
+              },
+              child: const Text("Add Patient"),
+            ),
           ],
         ),
       ),
@@ -317,12 +316,15 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
 
   void _addPatient(BuildContext context) async {
     try {
-      Patient patient = Patient(int.parse(idController.text),
-          nameController.text, int.parse(ageController.text),
-          genderController.text, int.parse(labNumberController.text),
-          referredByController.text, sampleController.text,
-          DateFormat(dateFormat).parse(dateAddedController.text)
-      );
+      Patient patient = Patient(
+          int.parse(idController.text),
+          nameController.text,
+          int.parse(ageController.text),
+          genderController.text,
+          int.parse(labNumberController.text),
+          referredByController.text,
+          sampleController.text,
+          DateFormat(dateFormat).parse(dateAddedController.text));
 
       GlobalHiveBox.patientsBox!.add(patient);
       GlobalHiveBox.patientsBox!.flush();
@@ -331,9 +333,8 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
       currentDT = DateTime.now();
       setState(() {
         idController.text = (GlobalHiveBox.patientsBox!.length + 1).toString();
-        nameController.text = ageController.text =
-            labNumberController.text = referredByController.text =
-            sampleController.text = "";
+        nameController.text =
+            ageController.text = labNumberController.text = referredByController.text = sampleController.text = "";
         dateAddedController.text = DateFormat(dateFormat).format(currentDT);
       });
     } catch (e) {
