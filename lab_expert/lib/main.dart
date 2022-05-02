@@ -6,6 +6,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:desktop_window/desktop_window.dart';
 import 'package:lab_expert/HiveEntities/patient.dart';
+import 'package:lab_expert/HiveEntities/report_section_type.dart';
+import 'package:lab_expert/HiveEntities/report_template.dart';
 import 'package:lab_expert/HiveEntities/user.dart';
 
 import 'package:lab_expert/scaffolds/login_scaffold.dart';
@@ -35,6 +37,8 @@ void main() async {
 
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(PatientAdapter());
+  Hive.registerAdapter(ReportTemplateAdapter());
+  Hive.registerAdapter(ReportSectionTypeAdapter());
 
   GlobalHiveBox.adminUserBox = await Hive.openBox<User>(Constants.adminUsersVaultKey,
       /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
@@ -44,6 +48,9 @@ void main() async {
 
   GlobalHiveBox.patientsBox = await Hive.openBox<Patient>(Constants.patientVaultKey,
       /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+
+  GlobalHiveBox.reportTemplateBox = await Hive.openBox<ReportTemplate>(Constants.reportTemplateVaultKey,
+    /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
 
   if (GlobalHiveBox.adminUserBox!.isEmpty && GlobalHiveBox.regularUserBox!.isEmpty) {
     runApp(MaterialApp(

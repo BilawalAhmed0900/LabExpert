@@ -19,6 +19,7 @@ dependencies:
   crypto: ^3.0.1
   desktop_window: ^0.4.0
   intl: ^0.17.0
+  uuid: ^3.0.6
 
 dev_dependencies:
   flutter_test:
