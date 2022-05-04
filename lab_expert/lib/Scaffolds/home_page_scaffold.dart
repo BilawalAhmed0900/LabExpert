@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab_expert/Scaffolds/edit_reports.dart';
+import 'package:lab_expert/Scaffolds/search_patient.dart';
 
 import '../Scaffolds/add_patient.dart';
 import '../Scaffolds/login_scaffold.dart';
@@ -52,6 +53,17 @@ class HomePageScaffold extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
+                    _searchPatient(context);
+                  },
+                  child: const Text("Search Patient"),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                       return const LoginScaffold();
@@ -68,14 +80,24 @@ class HomePageScaffold extends StatelessWidget {
   }
 
   void _addUser(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return const RegisterUserScaffold(firstPageNoUser: true);
-    }));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return const RegisterUserScaffold(firstPageNoUser: true);
+      }),
+    );
   }
 
   void _customizeReportLayout(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return const EditReportsLayout();
     }));
+  }
+
+  void _searchPatient(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return const SearchPatientScaffold();
+      }),
+    );
   }
 }

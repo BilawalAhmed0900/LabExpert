@@ -227,6 +227,11 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                                             TextButton(
                                               onPressed: () {
                                                 setState(() {
+                                                  ourTemplate.units.remove(ourTemplate.fieldTypes.keys.toList()[index]);
+                                                  ourTemplate.prices
+                                                      .remove(ourTemplate.fieldTypes.keys.toList()[index]);
+                                                  ourTemplate.fieldNormals
+                                                      .remove(ourTemplate.fieldTypes.keys.toList()[index]);
                                                   ourTemplate.fieldTypes
                                                       .remove(ourTemplate.fieldTypes.keys.toList()[index]);
                                                 });
