@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:lab_expert/HiveEntities/patient.dart';
+import 'package:lab_expert/Scaffolds/visit_patient.dart';
 import 'package:lab_expert/Singletons/global_hive_box.dart';
 
 class SearchPatientScaffold extends StatefulWidget {
@@ -165,7 +166,9 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
                         Text("${patients[index].name}, id: ${patients[index].id}, age: ${patients[index].age}"),
                         ElevatedButton(
                           onPressed: () {
-
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                              return VisitPatientScaffold(patientId: patients[index].id);
+                            }));
                           },
                           child: const Text("Visit"),
                         ),
