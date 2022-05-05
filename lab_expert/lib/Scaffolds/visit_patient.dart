@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lab_expert/HiveEntities/report_section_type.dart';
-import 'package:lab_expert/HiveEntities/report_template.dart';
 
+import '../HiveEntities/report_section_type.dart';
+import '../HiveEntities/report_template.dart';
 import '../HiveEntities/patient.dart';
 import '../Singletons/global_hive_box.dart';
 
@@ -53,7 +53,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
               children: [
                 Text(nextTemplate.reportName),
                 Switch(
-                  onChanged: (bool value) {
+                  onChanged: (value) {
                     setState(() {
                       selected[nextTemplate.id] = value;
                     });
