@@ -20,6 +20,9 @@ dependencies:
   desktop_window: ^0.4.0
   intl: ^0.17.0
   uuid: ^3.0.6
+  pdf: ^3.7.4
+  flutter_svg: ^1.0.3
+  flutter_svg_provider: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -31,3 +34,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/left_logo.svg
+    - assets/right_logo.svg

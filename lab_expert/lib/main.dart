@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:desktop_window/desktop_window.dart';
 import 'package:lab_expert/HiveEntities/patient.dart';
+import 'package:lab_expert/HiveEntities/patient_visiting.dart';
 import 'package:lab_expert/HiveEntities/report_section_type.dart';
 import 'package:lab_expert/HiveEntities/report_template.dart';
 import 'package:lab_expert/HiveEntities/user.dart';
@@ -39,6 +40,7 @@ void main() async {
   Hive.registerAdapter(PatientAdapter());
   Hive.registerAdapter(ReportTemplateAdapter());
   Hive.registerAdapter(ReportSectionTypeAdapter());
+  Hive.registerAdapter(PatientVisitingAdapter());
 
   GlobalHiveBox.adminUserBox = await Hive.openBox<User>(Constants.adminUsersVaultKey,
       /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
