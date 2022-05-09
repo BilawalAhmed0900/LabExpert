@@ -379,8 +379,8 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.135),
-                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.16),
+                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
+                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
                   ],
                 ),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
@@ -427,13 +427,13 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                 pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
                   pw.Text(
-                    "Test Details:",
+                    "Test Name:",
                     style: const pw.TextStyle(
                       fontSize: 8,
                     ),
                   ),
                   pw.Text(
-                    "Value",
+                    "Result",
                     style: const pw.TextStyle(
                       fontSize: 8,
                     ),

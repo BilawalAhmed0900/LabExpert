@@ -314,8 +314,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.135),
-                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.16),
+                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
+                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
                   ],
                 ),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
