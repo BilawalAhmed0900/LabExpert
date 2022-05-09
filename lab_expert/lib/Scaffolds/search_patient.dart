@@ -129,7 +129,7 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [
+              children: const [
               ],
             ),
           ),
@@ -137,7 +137,7 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [
+              children: const [
               ],
             ),
           ),

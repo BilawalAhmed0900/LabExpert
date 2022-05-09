@@ -12,10 +12,16 @@ class PatientVisiting extends HiveObject {
   final Map<String, bool> reportsSelected;
 
   @HiveField(2)
-  Uint8List? receiptPdf;
+  Uint8List receiptPdf;
 
   @HiveField(3)
+  DateTime receiptTime;
+
+  @HiveField(4)
   Uint8List? reportPdf;
 
-  PatientVisiting(this.patientId, this.reportsSelected, [this.receiptPdf, this.reportPdf]);
+  @HiveField(5)
+  DateTime? reportTime;
+
+  PatientVisiting(this.patientId, this.reportsSelected, this.receiptPdf, this.receiptTime, [this.reportPdf, this.reportTime]);
 }

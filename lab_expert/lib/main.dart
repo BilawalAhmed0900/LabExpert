@@ -54,9 +54,12 @@ void main() async {
   GlobalHiveBox.reportTemplateBox = await Hive.openBox<ReportTemplate>(Constants.reportTemplateVaultKey,
     /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
 
+  GlobalHiveBox.patientReportsBox = await Hive.openBox<PatientVisiting>(Constants.patientReportsVaultKey,
+    /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+
   if (GlobalHiveBox.adminUserBox!.isEmpty && GlobalHiveBox.regularUserBox!.isEmpty) {
     runApp(MaterialApp(
-      home: const RegisterUserScaffold(firstPageNoUser: true,),
+      home: const RegisterUserScaffold(firstPageNoUser: true, isAdmin: true),
       theme: ThemeData.dark(),
     ));
   } else {

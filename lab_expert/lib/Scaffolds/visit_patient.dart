@@ -1,12 +1,11 @@
-import 'dart:collection';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:lab_expert/HiveEntities/patient_visiting.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:intl/intl.dart';
 
 import '../HiveEntities/patient.dart';
 import '../HiveEntities/report_section_type.dart';
@@ -16,8 +15,7 @@ import '../Singletons/global_hive_box.dart';
 class VisitPatientScaffold extends StatefulWidget {
   final int patientId;
 
-  const VisitPatientScaffold({Key? key, required this.patientId})
-      : super(key: key);
+  const VisitPatientScaffold({Key? key, required this.patientId}) : super(key: key);
 
   @override
   _VisitPatientScaffoldState createState() => _VisitPatientScaffoldState();
@@ -37,16 +35,11 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   @override
   void initState() {
     super.initState();
-    _patient = GlobalHiveBox.patientsBox!.values
-        .where((element) => element.id == widget.patientId)
-        .first;
-    _reportTemplates = GlobalHiveBox.reportTemplateBox!.values
-        .where((element) => element.isHead == true)
-        .toList();
+    _patient = GlobalHiveBox.patientsBox!.values.where((element) => element.id == widget.patientId).first;
+    _reportTemplates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead == true).toList();
   }
 
-  ListView reportTemplateToListView(
-      Map<String, ReportSectionType> sectionTypes, Map<String, bool> selected,
+  ListView reportTemplateToListView(Map<String, ReportSectionType> sectionTypes, Map<String, bool> selected,
       [int level = 1]) {
     const ScrollPhysics scrollPhysics = ScrollPhysics();
     final ScrollController scrollController = ScrollController();
@@ -59,9 +52,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       controller: scrollController,
       itemCount: keys.length,
       itemBuilder: (context, index) {
-        ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values
-            .where((element) => element.id == keys[index])
-            .first;
+        ReportTemplate nextTemplate =
+            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
         if (sectionTypes[keys[index]] == ReportSectionType.field) {
           return Padding(
             padding: EdgeInsets.only(left: 8.0 * level),
@@ -88,8 +80,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(nextTemplate.reportName),
-                reportTemplateToListView(
-                    nextTemplate.fieldTypes, selected, level + 1)
+                reportTemplateToListView(nextTemplate.fieldTypes, selected, level + 1)
               ],
             ),
           );
@@ -126,9 +117,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(_reportTemplates[index].reportName),
-                          reportTemplateToListView(
-                              _reportTemplates[index].fieldTypes,
-                              _selectedReports)
+                          reportTemplateToListView(_reportTemplates[index].fieldTypes, _selectedReports)
                         ],
                       ),
                     );
@@ -166,9 +155,21 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                   child: Text("Total: ${getPriceWithDiscount()}"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    _selectedReports.removeWhere((key, value) => !value);
-                    createReceipt();
+                  onPressed: () async {
+                    Uint8List receiptPdf = await createReceipt();
+                    await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(_patient.id, _selectedReports, receiptPdf, DateTime.now().toLocal()));
+
+                    await showDialog(
+                      builder: (BuildContext context) {
+                        return const AlertDialog(
+                          title: Text("Successful"),
+                          content: Text("Operation successful. Please visit the reports tab to continue..."),
+                        );
+                      },
+                      context: context,
+                    );
+
+                    Navigator.of(context).pop();
                   },
                   child: const Text("Visit"),
                 ),
@@ -209,10 +210,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       if (value == ReportSectionType.field) {
         result |= _selectedReports[key] ?? false;
       } else if (value == ReportSectionType.subHeading) {
-        result |= fillWhichToWrite(GlobalHiveBox.reportTemplateBox!.values
-            .where((element) => element.id == key)
-            .first
-            .fieldTypes);
+        result |= fillWhichToWrite(
+            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes);
       }
     });
 
@@ -220,9 +219,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   }
 
   pw.ListView reportTemplateToListViewReceipt(
-      Map<String, ReportSectionType> template,
-      Map<String, int> prices,
-      Map<String, bool> selected,
+      Map<String, ReportSectionType> template, Map<String, int> prices, Map<String, bool> selected,
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
@@ -230,11 +227,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
     return pw.ListView.builder(
         itemBuilder: (context, index) {
-          ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values
-              .where((element) => element.id == keys[index])
-              .first;
-          print(prices);
-          print(prices[keys[index]]);
+          ReportTemplate nextTemplate =
+              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
           if (selected.containsKey(keys[index])) {
             if (template[keys[index]] == ReportSectionType.field) {
               return pw.Padding(
@@ -242,8 +236,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text(nextTemplate.reportName),
-                    pw.Text(prices[keys[index]].toString()),
+                    pw.Text(nextTemplate.reportName, style: const pw.TextStyle(fontSize: 8,),),
+                    pw.Text(prices[keys[index]].toString(), style: const pw.TextStyle(fontSize: 8,),),
                   ],
                 ),
               );
@@ -254,9 +248,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(nextTemplate.reportName),
-                    reportTemplateToListViewReceipt(nextTemplate.fieldTypes,
-                        nextTemplate.prices, selected, level + 1)
+                    pw.Text(nextTemplate.reportName, style: const pw.TextStyle(fontSize: 9,),),
+                    reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
                   ],
                 ),
               );
@@ -268,20 +261,16 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
         itemCount: keys.length);
   }
 
-  Future<Uint8List?> createReceipt() async {
+  Future<Uint8List> createReceipt() async {
     Map<String, bool> whichToWrite = <String, bool>{};
     Map<String, bool> whichHeadToWrite = <String, bool>{};
-    List<ReportTemplate> templates = GlobalHiveBox.reportTemplateBox!.values
-        .where((element) => element.isHead)
-        .toList();
+    List<ReportTemplate> templates =
+        GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
     for (ReportTemplate template in templates) {
       template.fieldTypes.forEach((key, value) {
         if (value == ReportSectionType.subHeading) {
-          whichToWrite[key] = fillWhichToWrite(GlobalHiveBox
-              .reportTemplateBox!.values
-              .where((element) => element.id == key)
-              .first
-              .fieldTypes);
+          whichToWrite[key] = fillWhichToWrite(
+              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes);
         } else {
           whichToWrite[key] = _selectedReports.containsKey(key);
         }
@@ -301,8 +290,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     }
 
     final String leftSvg = await rootBundle.loadString("assets/left_logo.svg");
-    final String rightSvg =
-        await rootBundle.loadString("assets/right_logo.svg");
+    final String rightSvg = await rootBundle.loadString("assets/right_logo.svg");
     const PdfPageFormat pageFormat = PdfPageFormat.a5;
 
     whichToWrite.addAll(_selectedReports);
@@ -312,11 +300,6 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
     List<String> whichHeadToWriteKeys = whichHeadToWrite.keys.toList();
     whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
-    whichToWrite.forEach((key, value) {
-      print(GlobalHiveBox.reportTemplateBox!.values
-          .singleWhere((element) => element.id == key)
-          .reportName);
-    });
 
     final pw.Document pdf = pw.Document();
     pdf.addPage(pw.Page(
@@ -331,48 +314,33 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.SvgImage(
-                        svg: leftSvg,
-                        height: pageFormat.availableHeight * 0.125),
-                    pw.SvgImage(
-                        svg: rightSvg,
-                        height: pageFormat.availableHeight * 0.15),
+                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.135),
+                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.16),
                   ],
                 ),
-                pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    children: [
-                      pw.Text("Name: ${_patient.name}"),
-                    ]
-                ),
-                pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    children: [
-                      pw.Text("Date: ${DateFormat("dd-mm-yyyy").format(DateTime.now().toLocal())}"),
-                    ]
-                ),
-                pw.SizedBox(height: pageFormat.availableHeight * 0.05),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  children: [
-                    pw.Text("Test Details:"),
-                  ]
-                ),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                  pw.Text("Name: ${_patient.name}", style: const pw.TextStyle(fontSize: 8,),),
+                ]),
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                  pw.Text("Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}", style: const pw.TextStyle(fontSize: 8,),),
+                ]),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                  pw.Text("Receipt Details:", style: const pw.TextStyle(fontSize: 8,),),
+                ]),
                 pw.Divider(borderStyle: pw.BorderStyle.dotted),
                 pw.ListView.separated(
                   itemBuilder: (context, index) {
-                    ReportTemplate template = GlobalHiveBox
-                        .reportTemplateBox!.values
-                        .where((element) =>
-                            element.id == whichHeadToWriteKeys[index])
+                    ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values
+                        .where((element) => element.id == whichHeadToWriteKeys[index])
                         .first;
                     return pw.Column(
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text(template.reportName),
-                          reportTemplateToListViewReceipt(template.fieldTypes,
-                              template.prices, whichToWrite),
+                          pw.Text(template.reportName, style: const pw.TextStyle(fontSize: 10,),),
+                          reportTemplateToListViewReceipt(template.fieldTypes, template.prices, whichToWrite),
                         ]);
                   },
                   separatorBuilder: (context, index) {
@@ -382,39 +350,26 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ),
               ],
             ),
-            pw.Column(
-              children: [
-                pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text("Total: "),
-                      pw.Text(getPrice().toString()),
-                    ]
-                ),
-                pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text("Discount: "),
-                      pw.Text(getDiscount().toString()),
-                    ]
-                ),
-                pw.Divider(borderStyle: pw.BorderStyle.dotted),
-                pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text("Net Total: "),
-                      pw.Text(getPriceWithDiscount().toString()),
-                    ]
-                ),
-              ]
-            ),
+            pw.Column(children: [
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                pw.Text("Total: ", style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(getPrice().toString(), style: const pw.TextStyle(fontSize: 8,),),
+              ]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                pw.Text("Discount: ", style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(getDiscount().toString(), style: const pw.TextStyle(fontSize: 8,),),
+              ]),
+              pw.Divider(borderStyle: pw.BorderStyle.dotted),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                pw.Text("Net Total: ", style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(getPriceWithDiscount().toString(), style: const pw.TextStyle(fontSize: 8,),),
+              ]),
+            ]),
           ],
         );
       },
     ));
 
-    File file = File("example.pdf");
-    file.writeAsBytesSync(await pdf.save());
-    return null;
+    return await pdf.save();
   }
 }

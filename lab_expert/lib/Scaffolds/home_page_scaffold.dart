@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lab_expert/Scaffolds/edit_reports.dart';
+import 'package:lab_expert/Scaffolds/finalize_reports_scaffold.dart';
 import 'package:lab_expert/Scaffolds/search_patient.dart';
+import 'package:lab_expert/Scaffolds/view_finalized_reports.dart';
+import 'package:lab_expert/Singletons/global_hive_box.dart';
 
 import '../Scaffolds/add_patient.dart';
 import '../Scaffolds/login_scaffold.dart';
@@ -20,7 +23,7 @@ class HomePageScaffold extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: (isAdmin) ? MainAxisAlignment.spaceAround : MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
@@ -57,6 +60,18 @@ class HomePageScaffold extends StatelessWidget {
                   },
                   child: const Text("Search Patient"),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    _finalizeReports(context);
+                  },
+                  child: const Text("Finalize Reports"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _viewFinalizeReports(context);
+                  },
+                  child: const Text("View Reports"),
+                ),
               ],
             ),
             Row(
@@ -82,7 +97,7 @@ class HomePageScaffold extends StatelessWidget {
   void _addUser(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return const RegisterUserScaffold(firstPageNoUser: true);
+        return RegisterUserScaffold(firstPageNoUser: false, isAdmin: isAdmin,);
       }),
     );
   }
@@ -97,6 +112,22 @@ class HomePageScaffold extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
         return const SearchPatientScaffold();
+      }),
+    );
+  }
+
+  void _finalizeReports(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return const FinalizeReportsScaffold();
+      }),
+    );
+  }
+
+  void _viewFinalizeReports(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return const ViewFinalizedReportsScaffold();
       }),
     );
   }
