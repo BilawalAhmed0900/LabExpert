@@ -8,4 +8,7 @@ enum ReportSectionType {
 
   @HiveField(1)
   subHeading,
+
+  @HiveField(2)
+  multipleLineComment,
 }

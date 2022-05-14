@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -94,7 +96,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
         ReportTemplate nextTemplate =
             GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
         if (selected.containsKey(keys[index])) {
-          if (sectionTypes[keys[index]] == ReportSectionType.field) {
+          if (sectionTypes[keys[index]] == ReportSectionType.field || sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
             return Padding(
               padding: EdgeInsets.only(left: 8.0 * level),
               child: Row(
@@ -104,15 +106,17 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                   Row(
                     children: [
                       SizedBox(
-                        width: screenWidth * 0.15,
+                        width: (sectionTypes[keys[index]] == ReportSectionType.field) ? screenWidth * 0.15 : screenWidth * 0.4,
                         child: TextField(
+                          minLines: (sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) ? 3 : 1,
+                          maxLines: (sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) ? 3 : 1,
                           onChanged: (newValue) {
                             finalizedValues[keys[index]] = newValue;
                           },
                           // controller: TextEditingController.fromValue(
                           //   TextEditingValue(text: finalizedValues[keys[index]] ?? ""),
                           // ),
-                          decoration: const InputDecoration(hintText: "Value"),
+                          decoration: InputDecoration(hintText: (sectionTypes[keys[index]] == ReportSectionType.field) ? "Value" : "Comment"),
                         ),
                       ),
                     ],
@@ -144,8 +148,22 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
   void initState() {
     super.initState();
 
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      DesktopWindow.setWindowSize(const Size(720, 880));
+    }
+
     _patient =
         GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == widget.patientVisiting.patientId);
+  }
+
+
+  @override
+  void dispose() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      DesktopWindow.setWindowSize(const Size(720, 505));
+    }
+
+    super.dispose();
   }
 
   @override
@@ -232,12 +250,14 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                     widget.patientVisiting.reportTime = DateTime.now().toLocal();
                     await GlobalHiveBox.patientReportsBox!.add(widget.patientVisiting);
 
-                    await showDialog(context: context, builder: (context) {
-                      return const AlertDialog(
-                        title: Text("Successful"),
-                        content: Text("Operation successful, go to view reports tab to view finalized reports"),
-                      );
-                    });
+                    await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const AlertDialog(
+                            title: Text("Successful"),
+                            content: Text("Operation successful, go to view reports tab to view finalized reports"),
+                          );
+                        });
 
                     Navigator.of(context).pop();
                   },
@@ -252,78 +272,125 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
   }
 
   pw.ListView reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, String> normals,
-      Map<String, String> units, Map<String, String> values, Map<String, bool> selected,
+      Map<String, String> units, Map<String, String> values, Map<String, bool> selected, double availableWidth,
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
     keys.sort((a, b) => a.compareTo(b));
 
     return pw.ListView.builder(
-        itemBuilder: (context, index) {
-          ReportTemplate nextTemplate =
-              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
-          if (selected.containsKey(keys[index])) {
-            if (template[keys[index]] == ReportSectionType.field) {
-              print(nextTemplate.reportName);
-              print(values[keys[index]]);
-              print(normals[keys[index]]);
-              print(units[keys[index]]);
-              return pw.Padding(
-                padding: pw.EdgeInsets.only(left: 8.0 * level),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
+      itemBuilder: (context, index) {
+        ReportTemplate nextTemplate =
+            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+        if (selected.containsKey(keys[index])) {
+          if (template[keys[index]] == ReportSectionType.field) {
+            print(nextTemplate.reportName);
+            print(values[keys[index]]);
+            print(normals[keys[index]]);
+            print(units[keys[index]]);
+            return pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.SizedBox(
+                  width: availableWidth * 0.55,
+                  child: pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 8.0 * level),
+                    child: pw.Text(
                       nextTemplate.reportName,
                       style: const pw.TextStyle(
                         fontSize: 8,
                       ),
                     ),
-                    pw.Text(
-                      values[keys[index]] ?? "",
-                      style: const pw.TextStyle(
-                        fontSize: 8,
+                  ),
+                ),
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
+                  child: pw.Text(
+                    values[keys[index]] ?? "",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
+                  child: pw.Text(
+                    normals[keys[index]] ?? "",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
+                  child: pw.Text(
+                    units[keys[index]] ?? "",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else if (template[keys[index]] == ReportSectionType.multipleLineComment) {
+            return
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(top: 16, bottom: 16),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.SizedBox(
+                      width: availableWidth * 0.55,
+                      child: pw.Padding(
+                        padding: pw.EdgeInsets.only(left: 8.0 * level),
+                        child: pw.Text(
+                          nextTemplate.reportName,
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
+                        ),
                       ),
                     ),
-                    pw.Text(
-                      normals[keys[index]] ?? "",
-                      style: const pw.TextStyle(
-                        fontSize: 8,
-                      ),
-                    ),
-                    pw.Text(
-                      units[keys[index]] ?? "",
-                      style: const pw.TextStyle(
-                        fontSize: 8,
+                    pw.SizedBox(
+                      width: availableWidth * 0.45,
+                      child: pw.Text(
+                        values[keys[index]] ?? "",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
                       ),
                     ),
                   ],
-                ),
+                )
               );
-            } else {
-              return pw.Padding(
-                padding: pw.EdgeInsets.only(left: 8.0 * level),
-                child: pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
+          }else
+      {
+            return pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.SizedBox(
+                  child: pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 8.0 * level),
+                    child: pw.Text(
                       nextTemplate.reportName,
                       style: const pw.TextStyle(
                         fontSize: 9,
                       ),
                     ),
-                    reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.fieldNormals,
-                        nextTemplate.units, values, selected, level + 1)
-                  ],
+                  ),
                 ),
-              );
-            }
-          } else {
-            return pw.Container();
+                reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.fieldNormals, nextTemplate.units,
+                    values, selected, availableWidth, level + 1)
+              ],
+            );
           }
-        },
-        itemCount: keys.length);
+        } else {
+          return pw.Container();
+        }
+      },
+      itemCount: keys.length,
+    );
   }
 
   Future<Uint8List> createReport() async {
@@ -424,33 +491,56 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                     ),
                   ),
                 ]),
-                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                 pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
                   pw.Text(
-                    "Test Name:",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
-                    ),
-                  ),
-                  pw.Text(
-                    "Result",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
-                    ),
-                  ),
-                  pw.Text(
-                    "Normal",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
-                    ),
-                  ),
-                  pw.Text(
-                    "Unit",
+                    "Referred By: ${_patient.referredBy}",
                     style: const pw.TextStyle(
                       fontSize: 8,
                     ),
                   ),
                 ]),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.SizedBox(
+                      width: pageFormat.availableWidth * 0.55,
+                      child: pw.Text(
+                        "Test Name:",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
+                    pw.SizedBox(
+                      width: pageFormat.availableWidth * 0.15,
+                      child: pw.Text(
+                        "Result",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
+                    pw.SizedBox(
+                      width: pageFormat.availableWidth * 0.15,
+                      child: pw.Text(
+                        "Normal",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
+                    pw.SizedBox(
+                      width: pageFormat.availableWidth * 0.15,
+                      child: pw.Text(
+                        "Unit",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 pw.Divider(borderStyle: pw.BorderStyle.dotted),
                 pw.ListView.separated(
                   itemBuilder: (context, index) {
@@ -462,13 +552,11 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            template.reportName,
-                            style: const pw.TextStyle(
-                              fontSize: 10,
-                            ),
+                            template.reportName.toUpperCase(),
+                            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
                           ),
-                          reportTemplateToListViewReceipt(
-                              template.fieldTypes, template.fieldNormals, template.units, writtenValues, whichToWrite),
+                          reportTemplateToListViewReceipt(template.fieldTypes, template.fieldNormals, template.units,
+                              writtenValues, whichToWrite, pageFormat.availableWidth),
                         ]);
                   },
                   separatorBuilder: (context, index) {

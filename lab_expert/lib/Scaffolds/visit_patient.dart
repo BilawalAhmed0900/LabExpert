@@ -39,7 +39,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     _reportTemplates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead == true).toList();
   }
 
-  ListView reportTemplateToListView(Map<String, ReportSectionType> sectionTypes, Map<String, bool> selected,
+  ListView reportTemplateToListView(Map<String, ReportSectionType> sectionTypes, Map<String, int> prices, Map<String, bool> selected,
       [int level = 1]) {
     const ScrollPhysics scrollPhysics = ScrollPhysics();
     final ScrollController scrollController = ScrollController();
@@ -54,21 +54,28 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       itemBuilder: (context, index) {
         ReportTemplate nextTemplate =
             GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
-        if (sectionTypes[keys[index]] == ReportSectionType.field) {
+        if (sectionTypes[keys[index]] == ReportSectionType.field || sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
           return Padding(
             padding: EdgeInsets.only(left: 8.0 * level),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(nextTemplate.reportName),
-                Switch(
-                  onChanged: (value) {
-                    setState(() {
-                      selected[nextTemplate.id] = value;
-                    });
-                  },
-                  value: selected[nextTemplate.id] ?? false,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(prices[keys[index]].toString()),
+                    Switch(
+                      onChanged: (value) {
+                        setState(() {
+                          selected[nextTemplate.id] = value;
+                        });
+                      },
+                      value: selected[nextTemplate.id] ?? false,
+                    ),
+                  ],
                 ),
+
               ],
             ),
           );
@@ -80,7 +87,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(nextTemplate.reportName),
-                reportTemplateToListView(nextTemplate.fieldTypes, selected, level + 1)
+                reportTemplateToListView(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
               ],
             ),
           );
@@ -117,7 +124,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(_reportTemplates[index].reportName),
-                          reportTemplateToListView(_reportTemplates[index].fieldTypes, _selectedReports)
+                          reportTemplateToListView(_reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports)
                         ],
                       ),
                     );

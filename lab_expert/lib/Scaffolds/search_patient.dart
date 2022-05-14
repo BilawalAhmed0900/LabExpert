@@ -129,25 +129,21 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
-              ],
+              children: const [],
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
-              ],
+              children: const [],
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
-                Text("Search Result: ")
-              ],
+              children: const [Text("Search Result: ")],
             ),
           ),
           Expanded(
@@ -204,16 +200,16 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
   }
 
   void _searchPatientById(int? id) {
+    List<Patient> searched;
     if (id == null) {
-      patients.addAll(GlobalHiveBox.patientsBox!.values);
+      searched = GlobalHiveBox.patientsBox!.values.toList();
     } else {
-      patients.addAll(
-        GlobalHiveBox.patientsBox!.values.where((element) => element.id == id),
-      );
+      searched = GlobalHiveBox.patientsBox!.values.where((element) => element.id == id).toList();
     }
+    searched.sort((a, b) => a.id.compareTo(b.id));
 
     setState(() {
-
+      patients.addAll(searched);
     });
   }
 
@@ -221,32 +217,30 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
     List<String> words = name.split(" ");
     words = words.map((element) => element.toLowerCase()).toList();
 
-    patients.addAll(
-      GlobalHiveBox.patientsBox!.values.where((element) {
-        bool result = true;
-        for (String word in words) {
-          result &= element.name.toLowerCase().contains(word);
-        }
+    List<Patient> searched = GlobalHiveBox.patientsBox!.values.where((element) {
+      bool result = true;
+      for (String word in words) {
+        result &= element.name.toLowerCase().contains(word);
+      }
 
-        return result;
-      }),
-    );
+      return result;
+    }).toList();
+    searched.sort((a, b) => a.name.compareTo(b.name));
 
     setState(() {
-
+      patients.addAll(searched);
     });
   }
 
   void _searchPatientByLabNumber(int? number) {
     if (number != null) {
-      patients.addAll(
-        GlobalHiveBox.patientsBox!.values.where((element) => element.id == number),
-      );
+      List<Patient> searched = GlobalHiveBox.patientsBox!.values.where((element) => element.id == number).toList();
+      searched.sort((a, b) => a.labNumber.compareTo(b.labNumber));
+
+      setState(() {
+        patients.addAll(searched);
+      });
     }
-
-    setState(() {
-
-    });
   }
 
   @override

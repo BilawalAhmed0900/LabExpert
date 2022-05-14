@@ -17,6 +17,8 @@ class ReportSectionTypeAdapter extends TypeAdapter<ReportSectionType> {
         return ReportSectionType.field;
       case 1:
         return ReportSectionType.subHeading;
+      case 2:
+        return ReportSectionType.multipleLineComment;
       default:
         return ReportSectionType.field;
     }
@@ -30,6 +32,9 @@ class ReportSectionTypeAdapter extends TypeAdapter<ReportSectionType> {
         break;
       case ReportSectionType.subHeading:
         writer.writeByte(1);
+        break;
+      case ReportSectionType.multipleLineComment:
+        writer.writeByte(2);
         break;
     }
   }

@@ -105,8 +105,11 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                                 value: (ourTemplate.fieldTypes[ourTemplate.fieldTypes.keys.toList()[index]] ==
                                         ReportSectionType.field)
                                     ? "Field"
-                                    : "Subheading",
-                                items: ["Field", "Subheading"]
+                                    : (ourTemplate.fieldTypes[ourTemplate.fieldTypes.keys.toList()[index]] ==
+                                            ReportSectionType.subHeading)
+                                        ? "Subheading"
+                                        : "Multiple Line Comment",
+                                items: ["Field", "Subheading", "Multiple Line Comment"]
                                     .map(
                                       (str) => DropdownMenuItem(
                                         value: str,
@@ -122,6 +125,9 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                                     } else if (newValue == "Subheading") {
                                       ourTemplate.fieldTypes[ourTemplate.fieldTypes.keys.toList()[index]] =
                                           ReportSectionType.subHeading;
+                                    } else if (newValue == "Multiple Line Comment") {
+                                      ourTemplate.fieldTypes[ourTemplate.fieldTypes.keys.toList()[index]] =
+                                          ReportSectionType.multipleLineComment;
                                     }
                                   });
                                 },
@@ -153,69 +159,78 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                                         Icons.edit,
                                       ),
                                     )
-                                  : Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 8, bottom: 16),
-                                          child: SizedBox(
-                                            width: screenWidth * 0.1,
-                                            child: TextField(
-                                              controller: TextEditingController.fromValue(TextEditingValue(
-                                                  text: ourTemplate
-                                                          .fieldNormals[ourTemplate.fieldTypes.keys.toList()[index]] ??
-                                                      "")),
-                                              onChanged: (newValue) {
-                                                ourTemplate.fieldNormals[ourTemplate.fieldTypes.keys.toList()[index]] =
-                                                    newValue;
-                                              },
-                                              decoration: const InputDecoration(hintText: "Normal"),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 8, bottom: 16),
-                                          child: SizedBox(
-                                            width: screenWidth * 0.1,
-                                            child: TextField(
-                                              controller: TextEditingController.fromValue(
-                                                TextEditingValue(
-                                                  text: ourTemplate.units[ourTemplate.fieldTypes.keys.toList()[index]]!
-                                                      .toString(),
+                                  : (ourTemplate.fieldTypes[ourTemplate.fieldTypes.keys.toList()[index]] ==
+                                          ReportSectionType.multipleLineComment)
+                                      ? Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: const [],
+                                        )
+                                      : Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8, bottom: 16),
+                                              child: SizedBox(
+                                                width: screenWidth * 0.1,
+                                                child: TextField(
+                                                  controller: TextEditingController.fromValue(TextEditingValue(
+                                                      text: ourTemplate.fieldNormals[
+                                                              ourTemplate.fieldTypes.keys.toList()[index]] ??
+                                                          "")),
+                                                  onChanged: (newValue) {
+                                                    ourTemplate
+                                                            .fieldNormals[ourTemplate.fieldTypes.keys.toList()[index]] =
+                                                        newValue;
+                                                  },
+                                                  decoration: const InputDecoration(hintText: "Normal"),
                                                 ),
                                               ),
-                                              onChanged: (newValue) {
-                                                ourTemplate.units[ourTemplate.fieldTypes.keys.toList()[index]] =
-                                                    newValue;
-                                              },
-                                              decoration: const InputDecoration(hintText: "Units"),
                                             ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 8, bottom: 16),
-                                          child: SizedBox(
-                                            width: screenWidth * 0.1,
-                                            child: TextField(
-                                              controller: TextEditingController.fromValue(
-                                                TextEditingValue(
-                                                  text: ourTemplate.prices[ourTemplate.fieldTypes.keys.toList()[index]]!
-                                                      .toString(),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8, bottom: 16),
+                                              child: SizedBox(
+                                                width: screenWidth * 0.1,
+                                                child: TextField(
+                                                  controller: TextEditingController.fromValue(
+                                                    TextEditingValue(
+                                                      text: ourTemplate
+                                                          .units[ourTemplate.fieldTypes.keys.toList()[index]]!
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                  onChanged: (newValue) {
+                                                    ourTemplate.units[ourTemplate.fieldTypes.keys.toList()[index]] =
+                                                        newValue;
+                                                  },
+                                                  decoration: const InputDecoration(hintText: "Units"),
                                                 ),
                                               ),
-                                              onChanged: (newValue) {
-                                                int? price = int.tryParse(newValue);
-                                                if (price != null) {
-                                                  ourTemplate.prices[ourTemplate.fieldTypes.keys.toList()[index]] =
-                                                      price;
-                                                }
-                                              },
-                                              decoration: const InputDecoration(hintText: "Price"),
                                             ),
-                                          ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8, bottom: 16),
+                                              child: SizedBox(
+                                                width: screenWidth * 0.1,
+                                                child: TextField(
+                                                  controller: TextEditingController.fromValue(
+                                                    TextEditingValue(
+                                                      text: ourTemplate
+                                                          .prices[ourTemplate.fieldTypes.keys.toList()[index]]!
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                  onChanged: (newValue) {
+                                                    int? price = int.tryParse(newValue);
+                                                    if (price != null) {
+                                                      ourTemplate.prices[ourTemplate.fieldTypes.keys.toList()[index]] =
+                                                          price;
+                                                    }
+                                                  },
+                                                  decoration: const InputDecoration(hintText: "Price"),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
                               TextButton(
                                 onPressed: () {
                                   showDialog(
