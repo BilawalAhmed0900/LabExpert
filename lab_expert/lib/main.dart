@@ -11,8 +11,8 @@ import './HiveEntities/report_section_type.dart';
 import './HiveEntities/report_template.dart';
 import './HiveEntities/user.dart';
 
-import './scaffolds/login_scaffold.dart';
-import './scaffolds/register_user_scaffold.dart';
+import './Scaffolds/login_scaffold.dart';
+import './Scaffolds/register_user_scaffold.dart';
 
 import './Constants/constants.dart';
 import './Singletons/global_hive_box.dart';
