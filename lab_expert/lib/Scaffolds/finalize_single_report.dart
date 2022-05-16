@@ -5,9 +5,9 @@ import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:lab_expert/HiveEntities/patient_visiting.dart';
-import 'package:lab_expert/HiveEntities/report_template.dart';
-import 'package:lab_expert/Singletons/global_hive_box.dart';
+import '../HiveEntities/patient_visiting.dart';
+import '../HiveEntities/report_template.dart';
+import '../Singletons/global_hive_box.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 

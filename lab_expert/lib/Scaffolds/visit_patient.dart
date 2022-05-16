@@ -39,7 +39,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     _reportTemplates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead == true).toList();
   }
 
-  ListView reportTemplateToListView(Map<String, ReportSectionType> sectionTypes, Map<String, int> prices, Map<String, bool> selected,
+  ListView reportTemplateToListView(
+      Map<String, ReportSectionType> sectionTypes, Map<String, int> prices, Map<String, bool> selected,
       [int level = 1]) {
     const ScrollPhysics scrollPhysics = ScrollPhysics();
     final ScrollController scrollController = ScrollController();
@@ -54,7 +55,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       itemBuilder: (context, index) {
         ReportTemplate nextTemplate =
             GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
-        if (sectionTypes[keys[index]] == ReportSectionType.field || sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
+        if (sectionTypes[keys[index]] == ReportSectionType.field ||
+            sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
           return Padding(
             padding: EdgeInsets.only(left: 8.0 * level),
             child: Row(
@@ -75,7 +77,6 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                     ),
                   ],
                 ),
-
               ],
             ),
           );
@@ -124,7 +125,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(_reportTemplates[index].reportName),
-                          reportTemplateToListView(_reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports)
+                          reportTemplateToListView(
+                              _reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports)
                         ],
                       ),
                     );
@@ -164,7 +166,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ElevatedButton(
                   onPressed: () async {
                     Uint8List receiptPdf = await createReceipt();
-                    await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(_patient.id, _selectedReports, receiptPdf, DateTime.now().toLocal()));
+                    await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(_patient.id, _selectedReports,
+                        receiptPdf, DateTime.now().toLocal(), getPrice(), getDiscount(), getPriceWithDiscount()));
 
                     await showDialog(
                       builder: (BuildContext context) {
@@ -243,8 +246,18 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text(nextTemplate.reportName, style: const pw.TextStyle(fontSize: 8,),),
-                    pw.Text(prices[keys[index]].toString(), style: const pw.TextStyle(fontSize: 8,),),
+                    pw.Text(
+                      nextTemplate.reportName,
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                    pw.Text(
+                      prices[keys[index]].toString(),
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -255,7 +268,12 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(nextTemplate.reportName, style: const pw.TextStyle(fontSize: 9,),),
+                    pw.Text(
+                      nextTemplate.reportName,
+                      style: const pw.TextStyle(
+                        fontSize: 9,
+                      ),
+                    ),
                     reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
                   ],
                 ),
@@ -327,14 +345,29 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                 pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text("Name: ${_patient.name}", style: const pw.TextStyle(fontSize: 8,),),
+                  pw.Text(
+                    "Name: ${_patient.name}",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
                 ]),
                 pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text("Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}", style: const pw.TextStyle(fontSize: 8,),),
+                  pw.Text(
+                    "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
                 ]),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                 pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text("Receipt Details:", style: const pw.TextStyle(fontSize: 8,),),
+                  pw.Text(
+                    "Receipt Details:",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
+                  ),
                 ]),
                 pw.Divider(borderStyle: pw.BorderStyle.dotted),
                 pw.ListView.separated(
@@ -346,7 +379,12 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text(template.reportName, style: const pw.TextStyle(fontSize: 10,),),
+                          pw.Text(
+                            template.reportName,
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                            ),
+                          ),
                           reportTemplateToListViewReceipt(template.fieldTypes, template.prices, whichToWrite),
                         ]);
                   },
@@ -359,17 +397,47 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
             ),
             pw.Column(children: [
               pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                pw.Text("Total: ", style: const pw.TextStyle(fontSize: 8,),),
-                pw.Text(getPrice().toString(), style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(
+                  "Total: ",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
+                pw.Text(
+                  getPrice().toString(),
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
               ]),
               pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                pw.Text("Discount: ", style: const pw.TextStyle(fontSize: 8,),),
-                pw.Text(getDiscount().toString(), style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(
+                  "Discount: ",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
+                pw.Text(
+                  getDiscount().toString(),
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
               ]),
               pw.Divider(borderStyle: pw.BorderStyle.dotted),
               pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                pw.Text("Net Total: ", style: const pw.TextStyle(fontSize: 8,),),
-                pw.Text(getPriceWithDiscount().toString(), style: const pw.TextStyle(fontSize: 8,),),
+                pw.Text(
+                  "Net Total: ",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
+                pw.Text(
+                  getPriceWithDiscount().toString(),
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
               ]),
             ]),
           ],

@@ -5,17 +5,17 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:desktop_window/desktop_window.dart';
-import 'package:lab_expert/HiveEntities/patient.dart';
-import 'package:lab_expert/HiveEntities/patient_visiting.dart';
-import 'package:lab_expert/HiveEntities/report_section_type.dart';
-import 'package:lab_expert/HiveEntities/report_template.dart';
-import 'package:lab_expert/HiveEntities/user.dart';
+import './HiveEntities/patient.dart';
+import './HiveEntities/patient_visiting.dart';
+import './HiveEntities/report_section_type.dart';
+import './HiveEntities/report_template.dart';
+import './HiveEntities/user.dart';
 
-import 'package:lab_expert/scaffolds/login_scaffold.dart';
-import 'package:lab_expert/scaffolds/register_user_scaffold.dart';
+import './scaffolds/login_scaffold.dart';
+import './scaffolds/register_user_scaffold.dart';
 
-import 'Constants/constants.dart';
-import 'Singletons/global_hive_box.dart';
+import './Constants/constants.dart';
+import './Singletons/global_hive_box.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -23,7 +23,7 @@ class RegisterUserScaffold extends StatefulWidget {
 class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool value = false;
+  bool value = true;
 
   @override
   void initState() {

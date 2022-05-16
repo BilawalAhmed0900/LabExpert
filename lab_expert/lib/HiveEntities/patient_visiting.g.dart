@@ -21,15 +21,18 @@ class PatientVisitingAdapter extends TypeAdapter<PatientVisiting> {
       (fields[1] as Map).cast<String, bool>(),
       fields[2] as Uint8List,
       fields[3] as DateTime,
-      fields[4] as Uint8List?,
-      fields[5] as DateTime?,
+      fields[4] as int,
+      fields[5] as int,
+      fields[6] as int,
+      fields[7] as Uint8List?,
+      fields[8] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PatientVisiting obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.patientId)
       ..writeByte(1)
@@ -39,8 +42,14 @@ class PatientVisitingAdapter extends TypeAdapter<PatientVisiting> {
       ..writeByte(3)
       ..write(obj.receiptTime)
       ..writeByte(4)
-      ..write(obj.reportPdf)
+      ..write(obj.receiptPrice)
       ..writeByte(5)
+      ..write(obj.receiptDiscount)
+      ..writeByte(6)
+      ..write(obj.receiptNetPrice)
+      ..writeByte(7)
+      ..write(obj.reportPdf)
+      ..writeByte(8)
       ..write(obj.reportTime);
   }
 
