@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:path/path.dart' as path;
+
 import 'package:desktop_window/desktop_window.dart';
+import 'package:path_provider/path_provider.dart';
 import './HiveEntities/patient.dart';
 import './HiveEntities/patient_visiting.dart';
 import './HiveEntities/report_section_type.dart';
@@ -18,6 +21,10 @@ import './Constants/constants.dart';
 import './Singletons/global_hive_box.dart';
 
 void main() async {
+  if (!File(path.join((await getApplicationDocumentsDirectory()).path, Constants.secretFileName)).existsSync()) {
+    return;
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   // if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
   //   //await DesktopWindow.setMaxWindowSize(const Size(1920, 1080));

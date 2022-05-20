@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:hive/hive.dart';
@@ -33,7 +34,7 @@ class PatientVisiting extends HiveObject {
   @HiveField(8)
   DateTime? reportTime;
 
-  PatientVisiting(this.patientId, this.reportsSelected, this.receiptPdf, this.receiptTime, this.receiptPrice,
-      this.receiptDiscount, this.receiptNetPrice,
+  PatientVisiting(this.patientId, this.reportsSelected, this.receiptPdf, this.receiptTime,
+      this.receiptPrice, this.receiptDiscount, this.receiptNetPrice,
       [this.reportPdf, this.reportTime]);
 }

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:hive/hive.dart';
 import 'report_section_type.dart';
 part 'report_template.g.dart';

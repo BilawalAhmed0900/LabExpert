@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:desktop_window/desktop_window.dart';
@@ -168,10 +169,10 @@ class _EditReportsLayoutState extends State<EditReportsLayout> {
                                   ReportTemplate(
                                     const Uuid().v4(),
                                     nameController.text,
-                                    <String, ReportSectionType>{},
-                                    <String, String>{},
-                                    <String, int>{},
-                                    <String, String>{},
+                                    LinkedHashMap<String, ReportSectionType>(),
+                                    LinkedHashMap<String, String>(),
+                                    LinkedHashMap<String, int>(),
+                                    LinkedHashMap<String, String>(),
                                     true,
                                   ),
                                 );

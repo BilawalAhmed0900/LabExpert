@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
   final TextEditingController _discountController = TextEditingController();
 
-  final Map<String, bool> _selectedReports = <String, bool>{};
+  final LinkedHashMap<String, bool> _selectedReports = LinkedHashMap<String, bool>();
 
   @override
   void initState() {
@@ -233,7 +234,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
-    keys.sort((a, b) => a.compareTo(b));
+    // keys.sort((a, b) => a.compareTo(b));
 
     return pw.ListView.builder(
         itemBuilder: (context, index) {
@@ -324,11 +325,13 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     whichHeadToWrite.removeWhere((key, value) => !value);
 
     List<String> whichHeadToWriteKeys = whichHeadToWrite.keys.toList();
-    whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
+    // whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
 
     final pw.Document pdf = pw.Document();
     pdf.addPage(pw.Page(
       pageFormat: pageFormat,
+      margin: pw.EdgeInsets.symmetric(
+          horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
       build: (context) {
         return pw.Column(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
