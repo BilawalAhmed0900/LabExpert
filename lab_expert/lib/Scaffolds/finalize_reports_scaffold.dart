@@ -13,7 +13,8 @@ import '../HiveEntities/patient.dart';
 import 'finalize_single_report.dart';
 
 class FinalizeReportsScaffold extends StatefulWidget {
-  const FinalizeReportsScaffold({Key? key}) : super(key: key);
+  final String username;
+  const FinalizeReportsScaffold({Key? key, required this.username}) : super(key: key);
 
   @override
   _FinalizeReportsScaffoldState createState() => _FinalizeReportsScaffoldState();
@@ -74,7 +75,7 @@ class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                    return FinalizeSingleReportScaffold(patientVisiting: nonFinalizedReports[index]);
+                                    return FinalizeSingleReportScaffold(patientVisiting: nonFinalizedReports[index], username: widget.username,);
                                   }));
 
                                   setState(() {});

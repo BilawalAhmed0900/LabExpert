@@ -91,6 +91,10 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                   shrinkWrap: true,
                   itemCount: ourTemplate.fieldTypes.keys.length,
                   itemBuilder: (context, index) {
+                    if (GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == ourTemplate.fieldTypes.keys.toList()[index]).isEmpty) {
+                      return Container();
+                    }
+
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -164,7 +168,31 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
                                           ReportSectionType.multipleLineComment)
                                       ? Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: const [],
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8, bottom: 16),
+                                              child: SizedBox(
+                                                width: screenWidth * 0.1,
+                                                child: TextField(
+                                                  controller: TextEditingController.fromValue(
+                                                    TextEditingValue(
+                                                      text: ourTemplate
+                                                          .prices[ourTemplate.fieldTypes.keys.toList()[index]]!
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                  onChanged: (newValue) {
+                                                    int? price = int.tryParse(newValue);
+                                                    if (price != null) {
+                                                      ourTemplate.prices[ourTemplate.fieldTypes.keys.toList()[index]] =
+                                                          price;
+                                                    }
+                                                  },
+                                                  decoration: const InputDecoration(hintText: "Price"),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         )
                                       : Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

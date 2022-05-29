@@ -23,7 +23,8 @@ bool isSameDate(DateTime first, DateTime second) {
 }
 
 class ViewFinalizedReportsScaffold extends StatefulWidget {
-  const ViewFinalizedReportsScaffold({Key? key}) : super(key: key);
+  final String username;
+  const ViewFinalizedReportsScaffold({Key? key, required this.username}) : super(key: key);
 
   @override
   _ViewFinalizedReportsScaffoldState createState() => _ViewFinalizedReportsScaffoldState();
@@ -40,8 +41,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
   void initState() {
     super.initState();
 
-    _reports = GlobalHiveBox.patientReportsBox!.values.where((element) => element.reportPdf != null).toList();
-    _reports.sort((a, b) => b.reportTime!.compareTo(a.reportTime!));
+    _reports = GlobalHiveBox.patientReportsBox!.values /*.where((element) => element.reportPdf != null)*/.toList();
+    _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.setWindowSize(const Size(720, 880));
@@ -59,11 +60,14 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("View Reports"),
+        title: const Text("View Reports/Receipts"),
       ),
       body: Column(
         children: [
@@ -110,9 +114,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                   onPressed: () {
                     setState(() {
                       _reports = GlobalHiveBox.patientReportsBox!.values.where((element) {
-                        return element.reportPdf != null && isSameDate(element.reportTime!, dateSelected);
+                        return /*element.reportPdf != null &&*/ isSameDate(element.receiptTime, dateSelected);
                       }).toList();
-                      _reports.sort((a, b) => b.reportTime!.compareTo(a.reportTime!));
+                      _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
                     });
                   },
                   child: const Icon(Icons.search),
@@ -161,7 +165,10 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                           child: const Text("View Receipt"),
                         ),
                         ElevatedButton(
-                          onPressed: () async {
+                          onPressed:
+                          (_reports[index].reportPdf == null)
+                              ? null
+                              : () async {
                             String tempDir = (await getTemporaryDirectory()).path;
                             File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
                             file.writeAsBytesSync(_reports[index].reportPdf!);
@@ -187,7 +194,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                     Uint8List pdf = await generateTheDaysReport(_reports);
 
                     String downloadDir = (await getDownloadsDirectory())!.path;
-                    File file = File(path.join(downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" + const Uuid().v4() + ".pdf"));
+                    File file = File(path.join(downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" +
+                        const Uuid().v4() + ".pdf"));
                     file.writeAsBytesSync(pdf);
 
                     OpenFile.open(file.path);
@@ -201,9 +209,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                   onPressed: () {
                     setState(() {
                       _reports = GlobalHiveBox.patientReportsBox!.values
-                          .where((element) => element.reportPdf != null)
+                      /*.where((element) => element.reportPdf != null)*/
                           .toList();
-                      _reports.sort((a, b) => b.reportTime!.compareTo(a.reportTime!));
+                      _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
                     });
                   },
                   child: const Text("Show All"),
@@ -240,6 +248,17 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                   ),
                   pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                   pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                        "created by: ${widget.username}",
+                        style: const pw.TextStyle(
+                          fontSize: 7,
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.start,
                     children: [
                       pw.Text(
@@ -256,19 +275,27 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.32,
-                              child: pw.Text(GlobalHiveBox.patientsBox!.values
+                              width: pageFormat.availableWidth * 0.30,
+                              child: pw.Text(GlobalHiveBox.patientsBox!
+                                  .values
                                   .singleWhere((element) => element.id == toWrite[index].patientId)
                                   .name),
                             ),
                             pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.32,
-                              child: pw.Text(DateFormat('dd-MM-yyyy hh:mm').format(toWrite[index].reportTime!)),
+                              width: pageFormat.availableWidth * 0.25,
+                              child: pw.Text(DateFormat('dd-MM-yyyy hh:mm').format(toWrite[index].receiptTime)),
                             ),
                             pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.32,
+                              width: pageFormat.availableWidth * 0.25,
                               child: pw.Text(
-                                  "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index].receiptNetPrice}"),
+                                "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index]
+                                    .receiptNetPrice}",),
+                            ),
+                            pw.SizedBox(
+                              width: pageFormat.availableWidth * 0.2,
+                              child: pw.Text(
+                                toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"
+                              ),
                             ),
                           ],
                         ),

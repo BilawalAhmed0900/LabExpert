@@ -169,10 +169,10 @@ class _EditReportsLayoutState extends State<EditReportsLayout> {
                                   ReportTemplate(
                                     const Uuid().v4(),
                                     nameController.text,
-                                    LinkedHashMap<String, ReportSectionType>(),
-                                    LinkedHashMap<String, String>(),
-                                    LinkedHashMap<String, int>(),
-                                    LinkedHashMap<String, String>(),
+                                    <String, ReportSectionType>{},
+                                    <String, String>{},
+                                    <String, int>{},
+                                    <String, String>{},
                                     true,
                                   ),
                                 );

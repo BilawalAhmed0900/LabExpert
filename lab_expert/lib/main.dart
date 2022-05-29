@@ -21,8 +21,10 @@ import './Constants/constants.dart';
 import './Singletons/global_hive_box.dart';
 
 void main() async {
-  if (!File(path.join((await getApplicationDocumentsDirectory()).path, Constants.secretFileName)).existsSync()) {
-    return;
+  if (!Platform.isAndroid && !Platform.isIOS) {
+    if (!File(path.join((await getApplicationDocumentsDirectory()).path, Constants.secretFileName)).existsSync()) {
+      return;
+    }
   }
 
   WidgetsFlutterBinding.ensureInitialized();

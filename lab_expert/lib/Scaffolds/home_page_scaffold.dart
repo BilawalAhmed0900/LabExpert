@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:lab_expert/HiveEntities/report_template.dart';
 import 'package:lab_expert/Scaffolds/edit_reports.dart';
 import 'package:lab_expert/Scaffolds/finalize_reports_scaffold.dart';
 import 'package:lab_expert/Scaffolds/search_patient.dart';
 import 'package:lab_expert/Scaffolds/view_finalized_reports.dart';
 import 'package:lab_expert/Singletons/global_hive_box.dart';
 
+import '../HiveEntities/report_section_type.dart';
 import '../Scaffolds/add_patient.dart';
 import '../Scaffolds/login_scaffold.dart';
 import '../Scaffolds/register_user_scaffold.dart';
 
 class HomePageScaffold extends StatelessWidget {
   final bool isAdmin;
+  final String username;
 
-  const HomePageScaffold({Key? key, required this.isAdmin}) : super(key: key);
+  const HomePageScaffold({Key? key, required this.isAdmin, required this.username}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -102,16 +105,35 @@ class HomePageScaffold extends StatelessWidget {
     );
   }
 
+  void cleanReports(ReportTemplate template) {
+    Map<String, ReportSectionType> updatedMap = <String, ReportSectionType>{};
+
+    template.fieldTypes.forEach((key, value) {
+      if (GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).isNotEmpty) {
+        updatedMap[key] = value;
+      }
+    });
+
+    template.fieldTypes = updatedMap;
+    template.fieldTypes.forEach((key, value) {
+      cleanReports(GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == key));
+    });
+  }
+
   void _customizeReportLayout(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return const EditReportsLayout();
-    }));
+    })).then((value) {
+      GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).forEach((element) {
+        cleanReports(element);
+      });
+    });
   }
 
   void _searchPatient(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return const SearchPatientScaffold();
+        return SearchPatientScaffold(username: username,);
       }),
     );
   }
@@ -119,7 +141,7 @@ class HomePageScaffold extends StatelessWidget {
   void _finalizeReports(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return const FinalizeReportsScaffold();
+        return FinalizeReportsScaffold(username: username,);
       }),
     );
   }
@@ -127,7 +149,7 @@ class HomePageScaffold extends StatelessWidget {
   void _viewFinalizeReports(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return const ViewFinalizedReportsScaffold();
+        return ViewFinalizedReportsScaffold(username: username,);
       }),
     );
   }

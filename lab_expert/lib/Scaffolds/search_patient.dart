@@ -7,7 +7,8 @@ import 'package:lab_expert/Scaffolds/visit_patient.dart';
 import 'package:lab_expert/Singletons/global_hive_box.dart';
 
 class SearchPatientScaffold extends StatefulWidget {
-  const SearchPatientScaffold({Key? key}) : super(key: key);
+  final String username;
+  const SearchPatientScaffold({Key? key, required this.username}) : super(key: key);
 
   @override
   _SearchPatientScaffoldState createState() => _SearchPatientScaffoldState();
@@ -163,7 +164,7 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
                         ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                              return VisitPatientScaffold(patientId: patients[index].id);
+                              return VisitPatientScaffold(patientId: patients[index].id, username: widget.username,);
                             }));
                           },
                           child: const Text("Visit"),

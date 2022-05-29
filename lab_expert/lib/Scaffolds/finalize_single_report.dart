@@ -16,8 +16,9 @@ import '../Singletons/global_hive_box.dart';
 
 class FinalizeSingleReportScaffold extends StatefulWidget {
   final PatientVisiting patientVisiting;
+  final String username;
 
-  const FinalizeSingleReportScaffold({Key? key, required this.patientVisiting}) : super(key: key);
+  const FinalizeSingleReportScaffold({Key? key, required this.patientVisiting, required this.username}) : super(key: key);
 
   @override
   _FinalizeSingleReportScaffoldState createState() => _FinalizeSingleReportScaffoldState();
@@ -31,19 +32,39 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
 
   Map<String, String> writtenValues = <String, String>{};
 
-  bool fillWhichToFinalize(Map<String, ReportSectionType> fields, Map<String, bool> selectedReports) {
+  bool fillWhichToFinalizeHelper(Map<String, ReportSectionType> fields, Map<String, bool> selectedReports) {
     bool result = false;
     fields.forEach((key, value) {
       if (value == ReportSectionType.field) {
         result |= selectedReports[key] ?? false;
       } else if (value == ReportSectionType.subHeading) {
-        result |= fillWhichToFinalize(
-            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes,
-            selectedReports);
+        if (GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).isNotEmpty) {
+          result |= fillWhichToFinalizeHelper(
+            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes, selectedReports);
+        }
       }
     });
 
     return result;
+  }
+
+  void fillWhichToFinalize(String key, Map<String, bool> toSelect, Map<String, bool> selected) {
+    ReportTemplate? template;
+
+    try {
+      template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == key);
+    } catch (_) {
+      template = null;
+    }
+
+    if (template == null) return;
+    toSelect[key] = fillWhichToFinalizeHelper(template.fieldTypes, selected);
+    template.fieldTypes.forEach((key, value) {
+
+      if (value == ReportSectionType.subHeading) {
+        fillWhichToFinalize(key, toSelect, selected);
+      }
+    });
   }
 
   Future<List<Map<String, bool>>> fillSelected(Map<String, bool> selectedReports) async {
@@ -51,21 +72,12 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     Map<String, bool> whichHeadToFinalize = <String, bool>{};
 
     List<ReportTemplate> templates =
-        GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
-
-    for (ReportTemplate template in templates) {
-      template.fieldTypes.forEach((key, value) {
-        if (value == ReportSectionType.subHeading) {
-          whichToFinalize[key] = fillWhichToFinalize(
-              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes,
-              selectedReports);
-        } else {
-          whichToFinalize[key] = selectedReports.containsKey(key);
-        }
-      });
+    GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
+    for (ReportTemplate element in templates) {
+      fillWhichToFinalize(element.id, whichToFinalize, selectedReports);
     }
-
     whichToFinalize.removeWhere((key, value) => !value);
+
     for (ReportTemplate template in templates) {
       bool result = false;
       template.fieldTypes.forEach((key, value) {
@@ -287,10 +299,6 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
             GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
         if (selected.containsKey(keys[index])) {
           if (template[keys[index]] == ReportSectionType.field) {
-            print(nextTemplate.reportName);
-            print(values[keys[index]]);
-            print(normals[keys[index]]);
-            print(units[keys[index]]);
             return pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
@@ -398,16 +406,19 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     Map<String, bool> whichHeadToWrite = <String, bool>{};
     List<ReportTemplate> templates =
         GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
-    for (ReportTemplate template in templates) {
-      template.fieldTypes.forEach((key, value) {
-        if (value == ReportSectionType.subHeading) {
-          whichToWrite[key] = fillWhichToFinalize(
-              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes,
-              widget.patientVisiting.reportsSelected);
-        } else {
-          whichToWrite[key] = widget.patientVisiting.reportsSelected.containsKey(key);
-        }
-      });
+    // for (ReportTemplate template in templates) {
+    //   template.fieldTypes.forEach((key, value) {
+    //     if (value == ReportSectionType.subHeading) {
+    //       whichToWrite[key] = fillWhichToFinalize(
+    //           GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes,
+    //           widget.patientVisiting.reportsSelected);
+    //     } else {
+    //       whichToWrite[key] = widget.patientVisiting.reportsSelected.containsKey(key);
+    //     }
+    //   });
+    // }
+    for (ReportTemplate element in templates) {
+      fillWhichToFinalize(element.id, whichToWrite, widget.patientVisiting.reportsSelected);
     }
 
     whichToWrite.removeWhere((key, value) => !value);
@@ -461,6 +472,17 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                         dpi: 960,
                       ),
                       pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
+                    ],
+                  ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                        "created by: ${widget.username}",
+                        style: const pw.TextStyle(
+                          fontSize: 7,
+                        ),
+                      ),
                     ],
                   ),
                   pw.SizedBox(height: pageFormat.availableHeight * 0.025),
@@ -609,7 +631,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                         child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
                           pw.Text(
                             "Dr. Yousaf Mushtaq",
-                            style: pw.TextStyle(fontSize: 8),
+                            style: const pw.TextStyle(fontSize: 8),
                           ),
                         ]),
                       ),
@@ -623,7 +645,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                         child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
                           pw.Text(
                             "M. Phil (Histopathologist)",
-                            style: pw.TextStyle(fontSize: 8),
+                            style: const pw.TextStyle(fontSize: 8),
                           ),
                         ]),
                       ),
