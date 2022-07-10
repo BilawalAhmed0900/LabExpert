@@ -20,6 +20,7 @@ class FinalizeReportsScaffold extends StatefulWidget {
   _FinalizeReportsScaffoldState createState() => _FinalizeReportsScaffoldState();
 }
 
+
 class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
   final ScrollController _scrollController = ScrollController();
   final ScrollPhysics _scrollPhysics = const ScrollPhysics();

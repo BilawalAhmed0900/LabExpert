@@ -23,14 +23,19 @@ class RegisterUserScaffold extends StatefulWidget {
 class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool value = true;
+  bool _value = true;
+  bool _showOriginalCharacter = true;
 
   @override
   void initState() {
     super.initState();
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
   }
 
@@ -73,16 +78,39 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
                           maxLength: 32,
                         ),
                       ),
-                      SizedBox(
-                        width: screenWidth * 0.75,
-                        child: TextField(
-                          obscuringCharacter: '*',
-                          obscureText: true,
-                          textAlign: TextAlign.right,
-                          controller: _passwordController,
-                          maxLength: 32,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: screenWidth * 0.65,
+                            child: TextField(
+                              obscuringCharacter: '*',
+                              obscureText: !_showOriginalCharacter,
+                              textAlign: TextAlign.right,
+                              controller: _passwordController,
+                              maxLength: 32,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: screenWidth * 0.1,
+                                child: Switch(
+                                  value: _showOriginalCharacter,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _showOriginalCharacter = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const Text("Show"),
+                            ],
+                          ),
+
+                        ],
                       ),
+
                     ],
                   ),
                 ),
@@ -97,10 +125,10 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
                     children: [
                       const Text("Make Admin: "),
                       Switch(
-                        value: value,
+                        value: _value,
                         onChanged: (newValue) {
                           setState(() {
-                            value = newValue;
+                            _value = newValue;
                           });
                         },
                       )
@@ -134,7 +162,7 @@ class _RegisterUserScaffoldState extends State<RegisterUserScaffold> {
     User person = User(sha256d);
 
     Box boxToCheck;
-    if (value) {
+    if (_value) {
       boxToCheck = GlobalHiveBox.adminUserBox!;
     } else {
       boxToCheck = GlobalHiveBox.regularUserBox!;

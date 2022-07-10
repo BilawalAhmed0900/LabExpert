@@ -24,6 +24,7 @@ bool isSameDate(DateTime first, DateTime second) {
 
 class ViewFinalizedReportsScaffold extends StatefulWidget {
   final String username;
+
   const ViewFinalizedReportsScaffold({Key? key, required this.username}) : super(key: key);
 
   @override
@@ -41,18 +42,29 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
   void initState() {
     super.initState();
 
-    _reports = GlobalHiveBox.patientReportsBox!.values /*.where((element) => element.reportPdf != null)*/.toList();
+    /*_reports = GlobalHiveBox.patientReportsBox!.values */ /*.where((element) => element.reportPdf != null)*/ /*.toList();*/
+    _reports = GlobalHiveBox.patientReportsBox!.values
+        .where((element) => isSameDate(element.receiptTime, dateSelected))
+        .toList();
     _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 880));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 880));
+        }
+      });
     }
   }
 
   @override
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
 
     super.dispose();
@@ -60,10 +72,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -165,16 +174,15 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                           child: const Text("View Receipt"),
                         ),
                         ElevatedButton(
-                          onPressed:
-                          (_reports[index].reportPdf == null)
+                          onPressed: (_reports[index].reportPdf == null)
                               ? null
                               : () async {
-                            String tempDir = (await getTemporaryDirectory()).path;
-                            File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
-                            file.writeAsBytesSync(_reports[index].reportPdf!);
+                                  String tempDir = (await getTemporaryDirectory()).path;
+                                  File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
+                                  file.writeAsBytesSync(_reports[index].reportPdf!);
 
-                            OpenFile.open(file.path);
-                          },
+                                  OpenFile.open(file.path);
+                                },
                           child: const Text("View Report"),
                         ),
                       ],
@@ -194,8 +202,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                     Uint8List pdf = await generateTheDaysReport(_reports);
 
                     String downloadDir = (await getDownloadsDirectory())!.path;
-                    File file = File(path.join(downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" +
-                        const Uuid().v4() + ".pdf"));
+                    File file = File(path.join(
+                        downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" + const Uuid().v4() + ".pdf"));
                     file.writeAsBytesSync(pdf);
 
                     OpenFile.open(file.path);
@@ -209,7 +217,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                   onPressed: () {
                     setState(() {
                       _reports = GlobalHiveBox.patientReportsBox!.values
-                      /*.where((element) => element.reportPdf != null)*/
+                          /*.where((element) => element.reportPdf != null)*/
                           .toList();
                       _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
                     });
@@ -239,6 +247,79 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             children: [
               pw.Column(
                 children: [
+                  pw.Container(
+                    color: PdfColor(
+                      Colors.black.red.toDouble() / 255.0,
+                      Colors.black.green.toDouble() / 255.0,
+                      Colors.black.blue.toDouble() / 255.0,
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          "L",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "R",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "I",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "B",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          " ",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "L",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "B",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: pageFormat.availableHeight * 0.01),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
@@ -276,8 +357,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                           children: [
                             pw.SizedBox(
                               width: pageFormat.availableWidth * 0.30,
-                              child: pw.Text(GlobalHiveBox.patientsBox!
-                                  .values
+                              child: pw.Text(GlobalHiveBox.patientsBox!.values
                                   .singleWhere((element) => element.id == toWrite[index].patientId)
                                   .name),
                             ),
@@ -288,20 +368,44 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                             pw.SizedBox(
                               width: pageFormat.availableWidth * 0.25,
                               child: pw.Text(
-                                "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index]
-                                    .receiptNetPrice}",),
+                                "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index].receiptNetPrice}",
+                              ),
                             ),
                             pw.SizedBox(
                               width: pageFormat.availableWidth * 0.2,
-                              child: pw.Text(
-                                toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"
-                              ),
+                              child: pw.Text(toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"),
                             ),
                           ],
                         ),
                       );
                     },
                     itemCount: toWrite.length,
+                  ),
+                ],
+              ),
+              pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                          "Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptPrice).toString().padLeft(5, ' ')}"),
+                    ],
+                  ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                          "Discount: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptDiscount).toString().padLeft(5, ' ')}"),
+                    ],
+                  ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                          "Net Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptNetPrice).toString().padLeft(5, ' ')}"),
+                    ],
                   ),
                 ],
               ),

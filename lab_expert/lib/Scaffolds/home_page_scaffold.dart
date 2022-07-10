@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab_expert/HiveEntities/report_template.dart';
+import 'package:lab_expert/Scaffolds/change_password.dart';
 import 'package:lab_expert/Scaffolds/edit_reports.dart';
 import 'package:lab_expert/Scaffolds/finalize_reports_scaffold.dart';
 import 'package:lab_expert/Scaffolds/search_patient.dart';
@@ -14,8 +15,9 @@ import '../Scaffolds/register_user_scaffold.dart';
 class HomePageScaffold extends StatelessWidget {
   final bool isAdmin;
   final String username;
+  final String sha256;
 
-  const HomePageScaffold({Key? key, required this.isAdmin, required this.username}) : super(key: key);
+  const HomePageScaffold({Key? key, required this.isAdmin, required this.username, required this.sha256}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,19 @@ class HomePageScaffold extends StatelessWidget {
                     _viewFinalizeReports(context);
                   },
                   child: const Text("View Reports"),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                      return ChangePasswordScaffold(username: username, oldSha256: sha256, isAdmin: isAdmin,);
+                    }));
+                  },
+                  child: const Text("Change Password"),
                 ),
               ],
             ),

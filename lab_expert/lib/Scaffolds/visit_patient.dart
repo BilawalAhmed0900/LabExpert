@@ -31,8 +31,11 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   late List<ReportTemplate> _reportTemplates;
 
   final TextEditingController _discountController = TextEditingController();
+  final TextEditingController _searchTestController = TextEditingController();
 
   final LinkedHashMap<String, bool> _selectedReports = LinkedHashMap<String, bool>();
+
+  String searchingTestName = "";
 
   @override
   void initState() {
@@ -41,13 +44,45 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     _reportTemplates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead == true).toList();
   }
 
-  ListView reportTemplateToListView(
-      Map<String, ReportSectionType> sectionTypes, Map<String, int> prices, Map<String, bool> selected,
+  void selectAllUnderneath(String id, Map<String, bool> selected) {
+    ReportTemplate? template;
+    try {
+      template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == id);
+    } catch (e) {
+      return;
+    }
+
+    template.fieldTypes.forEach((key, value) {
+      if (value == ReportSectionType.subHeading) {
+        selectAllUnderneath(key, selected);
+      } else {
+        selected[key] = true;
+      }
+    });
+  }
+
+  ListView reportTemplateToListView(Map<String, ReportSectionType> sectionTypes, Map<String, int> prices,
+      Map<String, bool> selected, String searchingTestName,
       [int level = 1]) {
     const ScrollPhysics scrollPhysics = ScrollPhysics();
     final ScrollController scrollController = ScrollController();
 
     List<String> keys = sectionTypes.keys.toList();
+    keys.removeWhere((keyId) {
+      if (sectionTypes[keyId] == ReportSectionType.subHeading) {
+        return false;
+      }
+
+      ReportTemplate? template;
+      try {
+        template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == keyId);
+      } catch (e) {
+        template = null;
+      }
+
+      if (template == null) return true;
+      return !template.reportName.toLowerCase().contains(searchingTestName.toLowerCase());
+    });
 
     return ListView.builder(
       shrinkWrap: true,
@@ -94,12 +129,30 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
         } else {
           return Padding(
             padding: EdgeInsets.only(top: 8.0, left: 8.0 * level),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // child: Column(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Text(nextTemplate.reportName),
+            //     reportTemplateToListView(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
+            //   ],
+            // ),
+            child: ExpansionTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(nextTemplate.reportName),
+                  ElevatedButton(onPressed: (){
+                    selectAllUnderneath(keys[index], selected);
+                    setState(() {
+
+                    });
+                  }, child: const Text("Select All"),),
+                ],
+              ),
               children: [
-                Text(nextTemplate.reportName),
-                reportTemplateToListView(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
+                reportTemplateToListView(
+                    nextTemplate.fieldTypes, nextTemplate.prices, selected, searchingTestName, level + 1),
               ],
             ),
           );
@@ -121,6 +174,30 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Search"),
+                  SizedBox(
+                    width: screenWidth * 0.65,
+                    child: TextField(
+                      controller: _searchTestController,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        searchingTestName = _searchTestController.text;
+                      });
+                    },
+                    child: const Icon(Icons.search),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
             Expanded(
               child: SingleChildScrollView(
                 child: ListView.separated(
@@ -135,9 +212,27 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_reportTemplates[index].reportName),
-                          reportTemplateToListView(
-                              _reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports)
+                          ExpansionTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(_reportTemplates[index].reportName),
+                                ElevatedButton(onPressed: (){
+                                  selectAllUnderneath(_reportTemplates[index].id, _selectedReports);
+                                  setState(() {
+
+                                  });
+                                }, child: const Text("Select All"),),
+                              ],
+                            ),
+                            children: [
+                              reportTemplateToListView(_reportTemplates[index].fieldTypes,
+                                  _reportTemplates[index].prices, _selectedReports, searchingTestName),
+                            ],
+                          ),
+                          // Text(_reportTemplates[index].reportName),
+                          // reportTemplateToListView(
+                          //     _reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports),
                         ],
                       ),
                     );
@@ -228,7 +323,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   bool fillWhichToWriteHelper(Map<String, ReportSectionType> fields) {
     bool result = false;
     fields.forEach((key, value) {
-      if (value == ReportSectionType.field) {
+      if (value != ReportSectionType.subHeading) {
         result |= _selectedReports[key] ?? false;
       } else if (value == ReportSectionType.subHeading) {
         try {
@@ -271,55 +366,56 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     // keys.sort((a, b) => a.compareTo(b));
 
     return pw.ListView.builder(
-        itemBuilder: (context, index) {
-          ReportTemplate nextTemplate =
-              GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
-          if (selected.containsKey(keys[index])) {
-            if (template[keys[index]] == ReportSectionType.field ||
-                template[keys[index]] == ReportSectionType.multipleLineComment) {
-              return pw.Padding(
-                padding: pw.EdgeInsets.only(left: 8.0 * level),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      nextTemplate.reportName,
-                      style: const pw.TextStyle(
-                        fontSize: 8,
-                      ),
+      itemBuilder: (context, index) {
+        ReportTemplate nextTemplate =
+            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+        if (selected.containsKey(keys[index])) {
+          if (template[keys[index]] == ReportSectionType.field ||
+              template[keys[index]] == ReportSectionType.multipleLineComment) {
+            return pw.Padding(
+              padding: pw.EdgeInsets.only(left: 8.0 * level),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    nextTemplate.reportName,
+                    style: const pw.TextStyle(
+                      fontSize: 8,
                     ),
-                    pw.Text(
-                      prices[keys[index]].toString(),
-                      style: const pw.TextStyle(
-                        fontSize: 8,
-                      ),
+                  ),
+                  pw.Text(
+                    prices[keys[index]].toString(),
+                    style: const pw.TextStyle(
+                      fontSize: 8,
                     ),
-                  ],
-                ),
-              );
-            } else {
-              return pw.Padding(
-                padding: pw.EdgeInsets.only(left: 8.0 * level),
-                child: pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
-                      nextTemplate.reportName,
-                      style: const pw.TextStyle(
-                        fontSize: 9,
-                      ),
-                    ),
-                    reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
-                  ],
-                ),
-              );
-            }
+                  ),
+                ],
+              ),
+            );
           } else {
-            return pw.Container();
+            return pw.Padding(
+              padding: pw.EdgeInsets.only(left: 8.0 * level),
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    nextTemplate.reportName,
+                    style: const pw.TextStyle(
+                      fontSize: 9,
+                    ),
+                  ),
+                  reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.prices, selected, level + 1)
+                ],
+              ),
+            );
           }
-        },
-        itemCount: keys.length);
+        } else {
+          return pw.Container();
+        }
+      },
+      itemCount: keys.length,
+    );
   }
 
   Future<Uint8List> createReceipt() async {
@@ -338,12 +434,17 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     //   });
     // }
     for (ReportTemplate element in templates) {
+      /*if (_selectedReports.containsKey(element.id)) {
+        whichToWrite[element.id] = _selectedReports[element.id]!;
+      } else {
+        fillWhichToWrite(element.id, whichToWrite);
+      }*/
       fillWhichToWrite(element.id, whichToWrite);
     }
     whichToWrite.removeWhere((key, value) => !value);
 
     for (ReportTemplate template in templates) {
-      bool result = false;
+      bool result = whichToWrite.containsKey(template.id);
       template.fieldTypes.forEach((key, value) {
         result |= whichToWrite.containsKey(key);
       });
@@ -387,16 +488,66 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                     child: pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text("L", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("A", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("R", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("A", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("I", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("B", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text(" ", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("L", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("A", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
-                        pw.Text("B", style: const pw.TextStyle(color: PdfColor(1, 1, 1),),),
+                        pw.Text(
+                          "L",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "R",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "I",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "B",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          " ",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "L",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "A",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
+                        pw.Text(
+                          "B",
+                          style: const pw.TextStyle(
+                            color: PdfColor(1, 1, 1),
+                          ),
+                        ),
                       ],
                     ),
                   ),

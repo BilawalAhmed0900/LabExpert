@@ -115,7 +115,7 @@ class _LoginScaffoldState extends State<LoginScaffold> {
 
     Navigator.of(context).pop();
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return HomePageScaffold(isAdmin: isAdmin, username: username,);
+      return HomePageScaffold(isAdmin: isAdmin, username: username, sha256: sha256d,);
     }));
   }
 }

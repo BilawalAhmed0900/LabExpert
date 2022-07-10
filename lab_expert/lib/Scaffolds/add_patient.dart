@@ -36,7 +36,11 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
     super.initState();
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(820, 980));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(820, 980));
+        }
+      });
     }
 
     currentDT = DateTime.now();
@@ -48,7 +52,11 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
   @override
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
 
     super.dispose();

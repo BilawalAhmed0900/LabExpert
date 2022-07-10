@@ -36,14 +36,22 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
     _nameController = TextEditingController.fromValue(TextEditingValue(text: ourTemplate.reportName));
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
   }
 
   @override
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
 
     super.dispose();

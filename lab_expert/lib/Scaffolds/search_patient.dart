@@ -127,6 +127,20 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
             ),
           ),
           Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _last5PatientsID();
+                  },
+                  child: const Text("Last 5 Patients by ID"),
+                ),
+              ],
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -201,6 +215,8 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
   }
 
   void _searchPatientById(int? id) {
+    patients.clear();
+
     List<Patient> searched;
     if (id == null) {
       searched = GlobalHiveBox.patientsBox!.values.toList();
@@ -215,6 +231,8 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
   }
 
   void _searchPatientByName(String name) {
+    patients.clear();
+
     List<String> words = name.split(" ");
     words = words.map((element) => element.toLowerCase()).toList();
 
@@ -235,6 +253,7 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
 
   void _searchPatientByLabNumber(int? number) {
     if (number != null) {
+      patients.clear();
       List<Patient> searched = GlobalHiveBox.patientsBox!.values.where((element) => element.id == number).toList();
       searched.sort((a, b) => a.labNumber.compareTo(b.labNumber));
 
@@ -244,19 +263,41 @@ class _SearchPatientScaffoldState extends State<SearchPatientScaffold> {
     }
   }
 
+  void _last5PatientsID() {
+    List<Patient> searched;
+    if (GlobalHiveBox.patientsBox!.length > 5) {
+      searched = GlobalHiveBox.patientsBox!.values.skip(GlobalHiveBox.patientsBox!.length - 5).toList();
+    } else {
+      searched = GlobalHiveBox.patientsBox!.values.toList();
+    }
+    searched.sort((a, b) => a.id.compareTo(b.id));
+
+    setState(() {
+      patients.addAll(searched);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 880));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 880));
+        }
+      });
     }
   }
 
   @override
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      DesktopWindow.setWindowSize(const Size(720, 505));
+      DesktopWindow.getFullScreen().then((value) {
+        if (!(value as bool)) {
+          DesktopWindow.setWindowSize(const Size(720, 505));
+        }
+      });
     }
 
     super.dispose();
