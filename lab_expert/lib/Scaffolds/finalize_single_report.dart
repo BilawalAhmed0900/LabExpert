@@ -266,20 +266,9 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                   onPressed: () async {
                     Uint8List report = await createReport();
 
-                    dynamic keyToRemove;
-                    GlobalHiveBox.patientReportsBox!.toMap().forEach((key, value) {
-                      if (value.reportPdf == null &&
-                          value.patientId == widget.patientVisiting.patientId &&
-                          value.reportsSelected == widget.patientVisiting.reportsSelected) {
-                        keyToRemove = key;
-                      }
-                    });
-
-                    await GlobalHiveBox.patientReportsBox!.delete(keyToRemove);
-
                     widget.patientVisiting.reportPdf = report;
                     widget.patientVisiting.reportTime = DateTime.now().toLocal();
-                    await GlobalHiveBox.patientReportsBox!.add(widget.patientVisiting);
+                    await widget.patientVisiting.save();
 
                     await showDialog(
                         context: context,

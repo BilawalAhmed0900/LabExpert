@@ -32,21 +32,33 @@ class ViewFinalizedReportsScaffold extends StatefulWidget {
 }
 
 class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaffold> {
-  late List<PatientVisiting> _reports;
+  final List<PatientVisiting> _reports = [];
   final ScrollController _scrollController = ScrollController();
   final ScrollPhysics _scrollPhysics = const ScrollPhysics();
 
   DateTime dateSelected = DateTime.now().toLocal();
+
+  Future<void> getReportsCurrentDate() async {
+    _reports.clear();
+    for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
+      PatientVisiting patientVisiting = (await GlobalHiveBox.patientReportsBox!.getAt(i))!;
+      if (isSameDate(patientVisiting.receiptTime, dateSelected)) {
+        _reports.add(patientVisiting);
+      }
+    }
+
+    _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+    setState(() {
+
+    });
+  }
 
   @override
   void initState() {
     super.initState();
 
     /*_reports = GlobalHiveBox.patientReportsBox!.values */ /*.where((element) => element.reportPdf != null)*/ /*.toList();*/
-    _reports = GlobalHiveBox.patientReportsBox!.values
-        .where((element) => isSameDate(element.receiptTime, dateSelected))
-        .toList();
-    _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+    getReportsCurrentDate();
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
@@ -122,10 +134,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _reports = GlobalHiveBox.patientReportsBox!.values.where((element) {
-                        return /*element.reportPdf != null &&*/ isSameDate(element.receiptTime, dateSelected);
-                      }).toList();
-                      _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+                      getReportsCurrentDate();
                     });
                   },
                   child: const Icon(Icons.search),
@@ -134,9 +143,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             ),
           ),
           const Divider(),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: const [
+            children: [
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text("Search Result:"),
@@ -214,12 +223,15 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    _reports.clear();
+                    for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
+                      _reports.add((await GlobalHiveBox.patientReportsBox!.getAt(i))!);
+                    }
+                    _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+
                     setState(() {
-                      _reports = GlobalHiveBox.patientReportsBox!.values
-                          /*.where((element) => element.reportPdf != null)*/
-                          .toList();
-                      _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+
                     });
                   },
                   child: const Text("Show All"),

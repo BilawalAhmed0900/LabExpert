@@ -10,5 +10,5 @@ class GlobalHiveBox {
   static Box<User>? regularUserBox;
   static Box<Patient>? patientsBox;
   static Box<ReportTemplate>? reportTemplateBox;
-  static Box<PatientVisiting>? patientReportsBox;
+  static LazyBox<PatientVisiting>? patientReportsBox;
 }
