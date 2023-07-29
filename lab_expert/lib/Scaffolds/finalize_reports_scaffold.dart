@@ -96,6 +96,7 @@ class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
                                     return FinalizeSingleReportScaffold(patientVisiting: nonFinalizedReports[index], username: widget.username,);
                                   }));
 
+                                  await getNonFinalizedReports();
                                   setState(() {});
                                 },
                                 child: const Text("Finalize Report"),

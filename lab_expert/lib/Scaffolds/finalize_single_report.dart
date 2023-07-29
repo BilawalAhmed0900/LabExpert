@@ -266,23 +266,9 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                   onPressed: () async {
                     Uint8List report = await createReport();
 
-                    int indexToRemove = -1;
-                    for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
-                      PatientVisiting patientVisiting = (await GlobalHiveBox.patientReportsBox!.getAt(i))!;
-                      if (patientVisiting.reportPdf == null &&
-                          patientVisiting.patientId == widget.patientVisiting.patientId &&
-                          patientVisiting.reportsSelected == widget.patientVisiting.reportsSelected) {
-                        indexToRemove = i;
-                      }
-                    }
-
-                    if (indexToRemove != -1) {
-                      await GlobalHiveBox.patientReportsBox!.deleteAt(indexToRemove);
-                    }
-
                     widget.patientVisiting.reportPdf = report;
                     widget.patientVisiting.reportTime = DateTime.now().toLocal();
-                    await GlobalHiveBox.patientReportsBox!.add(widget.patientVisiting);
+                    await widget.patientVisiting.save();
 
                     await showDialog(
                         context: context,

@@ -32,7 +32,7 @@ class ViewFinalizedReportsScaffold extends StatefulWidget {
 }
 
 class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaffold> {
-  late List<PatientVisiting> _reports;
+  final List<PatientVisiting> _reports = [];
   final ScrollController _scrollController = ScrollController();
   final ScrollPhysics _scrollPhysics = const ScrollPhysics();
 
@@ -223,13 +223,15 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
-                    setState(() async {
-                      _reports.clear();
-                      for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
-                        _reports.add((await GlobalHiveBox.patientReportsBox!.getAt(i))!);
-                      }
-                      _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+                  onPressed: () async {
+                    _reports.clear();
+                    for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
+                      _reports.add((await GlobalHiveBox.patientReportsBox!.getAt(i))!);
+                    }
+                    _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
+
+                    setState(() {
+
                     });
                   },
                   child: const Text("Show All"),
