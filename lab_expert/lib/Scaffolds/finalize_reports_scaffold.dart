@@ -24,13 +24,30 @@ class FinalizeReportsScaffold extends StatefulWidget {
 class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
   final ScrollController _scrollController = ScrollController();
   final ScrollPhysics _scrollPhysics = const ScrollPhysics();
+  final List<PatientVisiting> nonFinalizedReports = [];
+
+  Future<void> getNonFinalizedReports() async {
+    nonFinalizedReports.clear();
+    for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
+      PatientVisiting patientVisiting = (await GlobalHiveBox.patientReportsBox!.getAt(i))!;
+      if (patientVisiting.reportPdf == null) {
+        nonFinalizedReports.add(patientVisiting);
+      }
+    }
+
+    setState(() {
+
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getNonFinalizedReports();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<PatientVisiting> nonFinalizedReports =
-        GlobalHiveBox.patientReportsBox!.values.where((element) => element.reportPdf == null).toList();
-    nonFinalizedReports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Finalize Reports"),

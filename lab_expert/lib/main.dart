@@ -63,7 +63,7 @@ void main() async {
   GlobalHiveBox.reportTemplateBox = await Hive.openBox<ReportTemplate>(Constants.reportTemplateVaultKey,
     /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
 
-  GlobalHiveBox.patientReportsBox = await Hive.openBox<PatientVisiting>(Constants.patientReportsVaultKey,
+  GlobalHiveBox.patientReportsBox = await Hive.openLazyBox<PatientVisiting>(Constants.patientReportsVaultKey,
     /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
 
   if (GlobalHiveBox.adminUserBox!.isEmpty && GlobalHiveBox.regularUserBox!.isEmpty) {
