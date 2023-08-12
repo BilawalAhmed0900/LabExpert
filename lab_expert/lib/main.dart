@@ -21,13 +21,14 @@ import './Constants/constants.dart';
 import './Singletons/global_hive_box.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   if (!Platform.isAndroid && !Platform.isIOS) {
     if (!File(path.join((await getApplicationDocumentsDirectory()).path, Constants.secretFileName)).existsSync()) {
       return;
     }
   }
 
-  WidgetsFlutterBinding.ensureInitialized();
   // if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
   //   //await DesktopWindow.setMaxWindowSize(const Size(1920, 1080));
   //   //await DesktopWindow.setMinWindowSize(const Size(720, 505));

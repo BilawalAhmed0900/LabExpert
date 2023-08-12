@@ -48,9 +48,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
     }
 
     _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -106,8 +104,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                       child: SizedBox(
                         width: screenWidth * 0.5,
                         child: TextField(
-                          controller: TextEditingController.fromValue(
-                              TextEditingValue(text: DateFormat("dd-MM-yyyy").format(dateSelected))),
+                          controller:
+                              TextEditingController.fromValue(TextEditingValue(text: DateFormat("dd-MM-yyyy").format(dateSelected))),
                           readOnly: true,
                         ),
                       ),
@@ -143,9 +141,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             ),
           ),
           const Divider(),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+            children: const [
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text("Search Result:"),
@@ -160,8 +158,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 physics: _scrollPhysics,
                 itemCount: _reports.length,
                 itemBuilder: (context, index) {
-                  Patient patient = GlobalHiveBox.patientsBox!.values
-                      .singleWhere((element) => element.id == _reports[index].patientId);
+                  Patient patient = GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == _reports[index].patientId);
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -211,8 +208,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                     Uint8List pdf = await generateTheDaysReport(_reports);
 
                     String downloadDir = (await getDownloadsDirectory())!.path;
-                    File file = File(path.join(
-                        downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" + const Uuid().v4() + ".pdf"));
+                    File file =
+                        File(path.join(downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" + const Uuid().v4() + ".pdf"));
                     file.writeAsBytesSync(pdf);
 
                     OpenFile.open(file.path);
@@ -230,9 +227,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                     }
                     _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
 
-                    setState(() {
-
-                    });
+                    setState(() {});
                   },
                   child: const Text("Show All"),
                 ),
@@ -249,180 +244,183 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
     final String rightSvg = await rootBundle.loadString("assets/right_logo.svg");
     const PdfPageFormat pageFormat = PdfPageFormat.a4;
 
-    final pw.Document pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        pageFormat: pageFormat,
-        build: (context) {
-          return pw.Column(
+    List<pw.Widget> mainWidgets = [];
+    for (int index = 0; index < toWrite.length; index++) {
+      mainWidgets.add(
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(top: 4.0, bottom: 4.0),
+          child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Column(
+              pw.SizedBox(
+                width: pageFormat.availableWidth * 0.30,
+                child: pw.Text(GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).name),
+              ),
+              pw.SizedBox(
+                width: pageFormat.availableWidth * 0.25,
+                child: pw.Text(DateFormat('dd-MM-yyyy hh:mm').format(toWrite[index].receiptTime)),
+              ),
+              pw.SizedBox(
+                width: pageFormat.availableWidth * 0.25,
+                child: pw.Text(
+                  "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index].receiptNetPrice}",
+                ),
+              ),
+              pw.SizedBox(
+                width: pageFormat.availableWidth * 0.2,
+                child: pw.Text(toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final pw.Document pdf = pw.Document();
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: pageFormat,
+        footer: (context) {
+          if (context.pageNumber != context.pagesCount) {
+            return pw.Container();
+          }
+
+          return pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
-                  pw.Container(
-                    color: PdfColor(
-                      Colors.black.red.toDouble() / 255.0,
-                      Colors.black.green.toDouble() / 255.0,
-                      Colors.black.blue.toDouble() / 255.0,
-                    ),
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          "L",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "R",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "I",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "B",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          " ",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "L",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "B",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.SizedBox(height: pageFormat.availableHeight * 0.01),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
-                      pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
-                    ],
-                  ),
-                  pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                        "created by: ${widget.username}",
-                        style: const pw.TextStyle(
-                          fontSize: 7,
-                        ),
-                      ),
-                    ],
-                  ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        "Date: ${DateFormat('dd-MM-yyyy').format(dateSelected)}",
-                      ),
-                    ],
-                  ),
-                  pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                  pw.ListView.builder(
-                    itemBuilder: (context, index) {
-                      return pw.Padding(
-                        padding: const pw.EdgeInsets.only(top: 4.0, bottom: 4.0),
-                        child: pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.30,
-                              child: pw.Text(GlobalHiveBox.patientsBox!.values
-                                  .singleWhere((element) => element.id == toWrite[index].patientId)
-                                  .name),
-                            ),
-                            pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.25,
-                              child: pw.Text(DateFormat('dd-MM-yyyy hh:mm').format(toWrite[index].receiptTime)),
-                            ),
-                            pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.25,
-                              child: pw.Text(
-                                "${toWrite[index].receiptPrice} - ${toWrite[index].receiptDiscount} = ${toWrite[index].receiptNetPrice}",
-                              ),
-                            ),
-                            pw.SizedBox(
-                              width: pageFormat.availableWidth * 0.2,
-                              child: pw.Text(toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    itemCount: toWrite.length,
-                  ),
+                  pw.Text(
+                      "Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptPrice).toString().padLeft(5, ' ')}"),
                 ],
               ),
-              pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                          "Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptPrice).toString().padLeft(5, ' ')}"),
-                    ],
-                  ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                          "Discount: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptDiscount).toString().padLeft(5, ' ')}"),
-                    ],
-                  ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                          "Net Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptNetPrice).toString().padLeft(5, ' ')}"),
-                    ],
-                  ),
+                  pw.Text(
+                      "Discount: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptDiscount).toString().padLeft(5, ' ')}"),
+                ],
+              ),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text(
+                      "Net Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptNetPrice).toString().padLeft(5, ' ')}"),
                 ],
               ),
             ],
           );
+        },
+        build: (context) {
+          return [
+            pw.Column(
+              children: [
+                pw.Container(
+                  color: PdfColor(
+                    Colors.black.red.toDouble() / 255.0,
+                    Colors.black.green.toDouble() / 255.0,
+                    Colors.black.blue.toDouble() / 255.0,
+                  ),
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        "L",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "R",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "I",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "B",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        " ",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "L",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "B",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.01),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
+                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
+                  ],
+                ),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      "created by: ${widget.username}",
+                      style: const pw.TextStyle(
+                        fontSize: 7,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Date: ${DateFormat('dd-MM-yyyy').format(dateSelected)}",
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                ...mainWidgets,
+              ],
+            ),
+          ];
         },
       ),
     );

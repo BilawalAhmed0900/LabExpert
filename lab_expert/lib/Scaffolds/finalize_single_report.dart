@@ -291,119 +291,111 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     );
   }
 
-  pw.ListView reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, String> normals,
+  void reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, String> normals,
       Map<String, String> units, Map<String, String> values, Map<String, bool> selected, double availableWidth,
+      List<pw.Widget> widgets,
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
     // keys.sort((a, b) => a.compareTo(b));
 
-    return pw.ListView.builder(
-      itemBuilder: (context, index) {
-        ReportTemplate nextTemplate =
-            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
-        if (selected.containsKey(keys[index])) {
-          if (template[keys[index]] == ReportSectionType.field) {
-            return pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.SizedBox(
-                  width: availableWidth * 0.55,
-                  child: pw.Padding(
-                    padding: pw.EdgeInsets.only(left: 8.0 * level),
-                    child: pw.Text(
-                      nextTemplate.reportName,
-                      style: const pw.TextStyle(
-                        fontSize: 8,
-                      ),
-                    ),
-                  ),
-                ),
-                pw.SizedBox(
-                  width: availableWidth * 0.15,
+    for (int index = 0; index < keys.length; index++) {
+      ReportTemplate nextTemplate =
+          GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+      if (selected.containsKey(keys[index])) {
+        if (template[keys[index]] == ReportSectionType.field) {
+          widgets.add(pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.SizedBox(
+                width: availableWidth * 0.54,
+                child: pw.Padding(
+                  padding: pw.EdgeInsets.only(left: 8.0 * level),
                   child: pw.Text(
-                    values[keys[index]] ?? "",
+                    nextTemplate.reportName,
                     style: const pw.TextStyle(
                       fontSize: 8,
                     ),
                   ),
                 ),
-                pw.SizedBox(
-                  width: availableWidth * 0.15,
-                  child: pw.Text(
-                    normals[keys[index]] ?? "",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
-                    ),
+              ),
+              pw.SizedBox(
+                width: availableWidth * 0.15,
+                child: pw.Text(
+                  values[keys[index]] ?? "",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
                   ),
                 ),
-                pw.SizedBox(
-                  width: availableWidth * 0.15,
-                  child: pw.Text(
-                    units[keys[index]] ?? "",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
-                    ),
+              ),
+              pw.SizedBox(
+                width: availableWidth * 0.15,
+                child: pw.Text(
+                  normals[keys[index]] ?? "",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
                   ),
                 ),
-              ],
-            );
-          } else if (template[keys[index]] == ReportSectionType.multipleLineComment) {
-            return pw.Padding(
-                padding: const pw.EdgeInsets.only(top: 16, bottom: 16),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.SizedBox(
-                      width: availableWidth * 0.55,
-                      child: pw.Padding(
-                        padding: pw.EdgeInsets.only(left: 8.0 * level),
-                        child: pw.Text(
-                          nextTemplate.reportName,
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ),
-                    ),
-                    pw.SizedBox(
-                      width: availableWidth * 0.45,
+              ),
+              pw.SizedBox(
+                width: availableWidth * 0.15,
+                child: pw.Text(
+                  units[keys[index]] ?? "",
+                  style: const pw.TextStyle(
+                    fontSize: 8,
+                  ),
+                ),
+              ),
+            ],
+          ));
+        } else if (template[keys[index]] == ReportSectionType.multipleLineComment) {
+          widgets.add(pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 16, bottom: 16),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.SizedBox(
+                    width: availableWidth * 0.55,
+                    child: pw.Padding(
+                      padding: pw.EdgeInsets.only(left: 8.0 * level),
                       child: pw.Text(
-                        values[keys[index]] ?? "",
+                        nextTemplate.reportName,
                         style: const pw.TextStyle(
                           fontSize: 8,
                         ),
                       ),
                     ),
-                  ],
-                ));
-          } else {
-            return pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.SizedBox(
-                  child: pw.Padding(
-                    padding: pw.EdgeInsets.only(left: 8.0 * level),
+                  ),
+                  pw.SizedBox(
+                    width: availableWidth * 0.45,
                     child: pw.Text(
-                      nextTemplate.reportName,
+                      values[keys[index]] ?? "",
                       style: const pw.TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                       ),
                     ),
                   ),
-                ),
-                reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.fieldNormals, nextTemplate.units,
-                    values, selected, availableWidth, level + 1)
-              ],
-            );
-          }
+                ],
+              )));
         } else {
-          return pw.Container();
+          widgets.add(pw.SizedBox(
+            child: pw.Padding(
+              padding: pw.EdgeInsets.only(left: 8.0 * level),
+              child: pw.Text(
+                nextTemplate.reportName,
+                style: const pw.TextStyle(
+                  fontSize: 9,
+                ),
+              ),
+            ),
+          ));
+          reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.fieldNormals, nextTemplate.units,
+              values, selected, availableWidth, widgets, level + 1);
         }
-      },
-      itemCount: keys.length,
-    );
+      } else {
+        // return pw.Container(height: 0);
+      }
+    }
   }
 
   Future<Uint8List> createReport() async {
@@ -457,296 +449,303 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
 
     whichHeadToWrite.removeWhere((key, value) => !value);
 
+    List<pw.Widget> mainWidgets = [];
     List<String> whichHeadToWriteKeys = whichHeadToWrite.keys.toList();
     // whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
 
+    for (int index = 0; index < whichHeadToWriteKeys.length; index++) {
+      ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values
+          .where((element) => element.id == whichHeadToWriteKeys[index])
+          .first;
+      mainWidgets.add(
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          children: [
+            pw.Text(
+              template.reportName.toUpperCase(),
+              style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+            ),
+          ]
+        ),
+      );
+
+      reportTemplateToListViewReceipt(template.fieldTypes, template.fieldNormals, template.units,
+          writtenValues, whichToWrite, pageFormat.availableWidth, mainWidgets);
+
+      if (index < whichHeadToWriteKeys.length - 1) {
+        mainWidgets.add(pw.Divider(borderStyle: pw.BorderStyle.dotted));
+      }
+    }
+
     final pw.Document pdf = pw.Document();
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: pageFormat,
         margin: pw.EdgeInsets.symmetric(
             horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
-        build: (context) {
+        footer: (context) {
+          if (context.pageNumber != context.pagesCount) {
+            return pw.Container();
+          }
+
           return pw.Column(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.start,
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
-                  pw.Container(
-                    color: PdfColor(
-                      Colors.black.red.toDouble() / 255.0,
-                      Colors.black.green.toDouble() / 255.0,
-                      Colors.black.blue.toDouble() / 255.0,
-                    ),
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          "L",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
+                  pw.SizedBox(
+                    width: pageFormat.availableWidth * 0.33,
+                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
+                      pw.Text(
+                        "Pathologist",
+                        style: pw.TextStyle(
+                          decoration: pw.TextDecoration.underline,
+                          fontWeight: pw.FontWeight.bold,
                         ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "R",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "I",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "B",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          " ",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "L",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "A",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                        pw.Text(
-                          "B",
-                          style: const pw.TextStyle(
-                            color: PdfColor(1, 1, 1),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.SizedBox(height: pageFormat.availableHeight * 0.01),
-                  pw.Column(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    children: [
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
-                          pw.Image(
-                            pw.MemoryImage(
-                              logoBytes.buffer.asUint8List(),
-                            ),
-                            width: pageFormat.availableWidth * 0.2,
-                            height: pageFormat.availableWidth * 0.2,
-                            dpi: 960,
-                          ),
-                          pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
-                        ],
                       ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.end,
-                        children: [
-                          pw.Text(
-                            "created by: ${widget.username}",
-                            style: const pw.TextStyle(
-                              fontSize: 7,
-                            ),
-                          ),
-                        ],
-                      ),
-                      pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                        pw.Text(
-                          "Name: ${_patient.name}",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ]),
-                      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                        pw.Text(
-                          "Age: ${_patient.age} years / months / days",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ]),
-                      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                        pw.Text(
-                          "Sex: ${_patient.gender}",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ]),
-                      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                        pw.Text(
-                          "Lab Number: ${_patient.labNumber}",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ]),
-                      pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                        pw.Text(
-                          "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ]),
-                      _patient.referredBy.isNotEmpty
-                          ? pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                        pw.Text(
-                          "Referred By: ${_patient.referredBy}",
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                          ),
-                        ),
-                      ])
-                          : pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                      pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.SizedBox(
-                            width: pageFormat.availableWidth * 0.55,
-                            child: pw.Text(
-                              "Test Name:",
-                              style: const pw.TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                          pw.SizedBox(
-                            width: pageFormat.availableWidth * 0.15,
-                            child: pw.Text(
-                              "Result",
-                              style: const pw.TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                          pw.SizedBox(
-                            width: pageFormat.availableWidth * 0.15,
-                            child: pw.Text(
-                              "Normal",
-                              style: const pw.TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                          pw.SizedBox(
-                            width: pageFormat.availableWidth * 0.15,
-                            child: pw.Text(
-                              "Unit",
-                              style: const pw.TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      pw.Divider(borderStyle: pw.BorderStyle.dotted),
-                      pw.ListView.separated(
-                        itemBuilder: (context, index) {
-                          ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values
-                              .where((element) => element.id == whichHeadToWriteKeys[index])
-                              .first;
-                          return pw.Column(
-                              mainAxisAlignment: pw.MainAxisAlignment.start,
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  template.reportName.toUpperCase(),
-                                  style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-                                ),
-                                reportTemplateToListViewReceipt(template.fieldTypes, template.fieldNormals, template.units,
-                                    writtenValues, whichToWrite, pageFormat.availableWidth),
-                              ]);
-                        },
-                        separatorBuilder: (context, index) {
-                          return pw.Divider(borderStyle: pw.BorderStyle.dotted);
-                        },
-                        itemCount: whichHeadToWriteKeys.length,
-                      ),
-                    ],
+                    ]),
                   ),
                 ],
               ),
-              pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.SizedBox(
-                        width: pageFormat.availableWidth * 0.33,
-                        child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                          pw.Text(
-                            "Pathologist",
-                            style: pw.TextStyle(
-                              decoration: pw.TextDecoration.underline,
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                        ]),
+                  pw.SizedBox(
+                    width: pageFormat.availableWidth * 0.33,
+                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
+                      pw.Text(
+                        "Dr. Yousaf Mushtaq",
+                        style: const pw.TextStyle(fontSize: 8),
                       ),
-                    ],
+                    ]),
                   ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.SizedBox(
-                        width: pageFormat.availableWidth * 0.33,
-                        child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                          pw.Text(
-                            "Dr. Yousaf Mushtaq",
-                            style: const pw.TextStyle(fontSize: 8),
-                          ),
-                        ]),
+                ],
+              ),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SizedBox(
+                    width: pageFormat.availableWidth * 0.33,
+                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
+                      pw.Text(
+                        "M. Phil (Histopathologist)",
+                        style: const pw.TextStyle(fontSize: 8),
                       ),
-                    ],
-                  ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.end,
-                    children: [
-                      pw.SizedBox(
-                        width: pageFormat.availableWidth * 0.33,
-                        child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                          pw.Text(
-                            "M. Phil (Histopathologist)",
-                            style: const pw.TextStyle(fontSize: 8),
-                          ),
-                        ]),
-                      ),
-                    ],
+                    ]),
                   ),
                 ],
               ),
             ],
           );
+        },
+        build: (context) {
+          return [
+            pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              children: [
+                pw.Container(
+                  color: PdfColor(
+                    Colors.black.red.toDouble() / 255.0,
+                    Colors.black.green.toDouble() / 255.0,
+                    Colors.black.blue.toDouble() / 255.0,
+                  ),
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        "L",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "R",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "I",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "B",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        " ",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "L",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "A",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                      pw.Text(
+                        "B",
+                        style: const pw.TextStyle(
+                          color: PdfColor(1, 1, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                pw.SizedBox(height: pageFormat.availableHeight * 0.01),
+                pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
+                        pw.Image(
+                          pw.MemoryImage(
+                            logoBytes.buffer.asUint8List(),
+                          ),
+                          width: pageFormat.availableWidth * 0.2,
+                          height: pageFormat.availableWidth * 0.2,
+                          dpi: 960,
+                        ),
+                        pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          "created by: ${widget.username}",
+                          style: const pw.TextStyle(
+                            fontSize: 7,
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                      pw.Text(
+                        "Name: ${_patient.name}",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ]),
+                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                      pw.Text(
+                        "Age: ${_patient.age} years / months / days",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ]),
+                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                      pw.Text(
+                        "Sex: ${_patient.gender}",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ]),
+                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+                      pw.Text(
+                        "Lab Number: ${_patient.labNumber}",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ]),
+                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                      pw.Text(
+                        "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ]),
+                    _patient.referredBy.isNotEmpty
+                        ? pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
+                      pw.Text(
+                        "Referred By: ${_patient.referredBy}",
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                        ),
+                      ),
+                    ])
+                        : pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                    pw.SizedBox(height: pageFormat.availableHeight * 0.025),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.SizedBox(
+                          width: pageFormat.availableWidth * 0.55,
+                          child: pw.Text(
+                            "Test Name:",
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                        ),
+                        pw.SizedBox(
+                          width: pageFormat.availableWidth * 0.15,
+                          child: pw.Text(
+                            "Result",
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                        ),
+                        pw.SizedBox(
+                          width: pageFormat.availableWidth * 0.15,
+                          child: pw.Text(
+                            "Normal",
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                        ),
+                        pw.SizedBox(
+                          width: pageFormat.availableWidth * 0.15,
+                          child: pw.Text(
+                            "Unit",
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Divider(borderStyle: pw.BorderStyle.dotted),
+                  ],
+                ),
+                ...mainWidgets,
+              ],
+            ),
+          ];
         },
       ),
     );
