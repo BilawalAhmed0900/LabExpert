@@ -35,6 +35,7 @@ class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
       }
     }
 
+    nonFinalizedReports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
     setState(() {
 
     });

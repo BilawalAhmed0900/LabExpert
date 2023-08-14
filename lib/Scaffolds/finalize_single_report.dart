@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +67,6 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     if (template == null) return;
     toSelect[key] = fillWhichToFinalizeHelper(template.fieldTypes, selected);
     template.fieldTypes.forEach((key, value) {
-
       if (value == ReportSectionType.subHeading) {
         fillWhichToFinalize(key, toSelect, selected);
       }
@@ -79,8 +77,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     Map<String, bool> whichToFinalize = <String, bool>{};
     Map<String, bool> whichHeadToFinalize = <String, bool>{};
 
-    List<ReportTemplate> templates =
-    GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
+    List<ReportTemplate> templates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
     for (ReportTemplate element in templates) {
       fillWhichToFinalize(element.id, whichToFinalize, selectedReports);
     }
@@ -113,11 +110,9 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
       itemBuilder: (context, index) {
         double screenWidth = MediaQuery.of(context).size.width;
 
-        ReportTemplate nextTemplate =
-            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+        ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
         if (selected.containsKey(keys[index])) {
-          if (sectionTypes[keys[index]] == ReportSectionType.field ||
-              sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
+          if (sectionTypes[keys[index]] == ReportSectionType.field || sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
             return Padding(
               padding: EdgeInsets.only(left: 8.0 * level),
               child: Row(
@@ -127,9 +122,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                   Row(
                     children: [
                       SizedBox(
-                        width: (sectionTypes[keys[index]] == ReportSectionType.field)
-                            ? screenWidth * 0.15
-                            : screenWidth * 0.4,
+                        width: (sectionTypes[keys[index]] == ReportSectionType.field) ? screenWidth * 0.15 : screenWidth * 0.4,
                         child: TextField(
                           minLines: (sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) ? 3 : 1,
                           maxLines: (sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) ? 3 : 1,
@@ -139,8 +132,8 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                           // controller: TextEditingController.fromValue(
                           //   TextEditingValue(text: finalizedValues[keys[index]] ?? ""),
                           // ),
-                          decoration: InputDecoration(
-                              hintText: (sectionTypes[keys[index]] == ReportSectionType.field) ? "Value" : "Comment"),
+                          decoration:
+                              InputDecoration(hintText: (sectionTypes[keys[index]] == ReportSectionType.field) ? "Value" : "Comment"),
                         ),
                       ),
                     ],
@@ -180,8 +173,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
       });
     }
 
-    _patient =
-        GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == widget.patientVisiting.patientId);
+    _patient = GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == widget.patientVisiting.patientId);
   }
 
   @override
@@ -235,9 +227,8 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                       shrinkWrap: true,
                       itemCount: whichHeadToFinalizeKeys.length,
                       itemBuilder: (context, index) {
-                        ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values
-                            .where((element) => element.id == whichHeadToFinalizeKeys[index])
-                            .first;
+                        ReportTemplate nextTemplate =
+                            GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == whichHeadToFinalizeKeys[index]).first;
 
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -291,65 +282,66 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     );
   }
 
-  void reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, String> normals,
-      Map<String, String> units, Map<String, String> values, Map<String, bool> selected, double availableWidth,
-      List<pw.Widget> widgets,
+  void reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, String> normals, Map<String, String> units,
+      Map<String, String> values, Map<String, bool> selected, double availableWidth, List<pw.Widget> widgets,
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
     // keys.sort((a, b) => a.compareTo(b));
 
     for (int index = 0; index < keys.length; index++) {
-      ReportTemplate nextTemplate =
-          GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+      ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
       if (selected.containsKey(keys[index])) {
         if (template[keys[index]] == ReportSectionType.field) {
-          widgets.add(pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.SizedBox(
-                width: availableWidth * 0.54,
-                child: pw.Padding(
-                  padding: pw.EdgeInsets.only(left: 8.0 * level),
+          widgets.add(
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.SizedBox(
+                  width: availableWidth * 0.54,
+                  child: pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 8.0 * level),
+                    child: pw.Text(
+                      nextTemplate.reportName,
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                  ),
+                ),
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
                   child: pw.Text(
-                    nextTemplate.reportName,
+                    values[keys[index]] ?? "",
                     style: const pw.TextStyle(
                       fontSize: 8,
                     ),
                   ),
                 ),
-              ),
-              pw.SizedBox(
-                width: availableWidth * 0.15,
-                child: pw.Text(
-                  values[keys[index]] ?? "",
-                  style: const pw.TextStyle(
-                    fontSize: 8,
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
+                  child: pw.Text(
+                    normals[keys[index]] ?? "",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
                   ),
                 ),
-              ),
-              pw.SizedBox(
-                width: availableWidth * 0.15,
-                child: pw.Text(
-                  normals[keys[index]] ?? "",
-                  style: const pw.TextStyle(
-                    fontSize: 8,
+                pw.SizedBox(
+                  width: availableWidth * 0.15,
+                  child: pw.Text(
+                    units[keys[index]] ?? "",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
                   ),
                 ),
-              ),
-              pw.SizedBox(
-                width: availableWidth * 0.15,
-                child: pw.Text(
-                  units[keys[index]] ?? "",
-                  style: const pw.TextStyle(
-                    fontSize: 8,
-                  ),
-                ),
-              ),
-            ],
-          ));
+              ],
+            ),
+          );
         } else if (template[keys[index]] == ReportSectionType.multipleLineComment) {
-          widgets.add(pw.Padding(
+          widgets.add(
+            pw.Padding(
               padding: const pw.EdgeInsets.only(top: 16, bottom: 16),
               child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -376,21 +368,38 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                     ),
                   ),
                 ],
-              )));
-        } else {
-          widgets.add(pw.SizedBox(
-            child: pw.Padding(
-              padding: pw.EdgeInsets.only(left: 8.0 * level),
-              child: pw.Text(
-                nextTemplate.reportName,
-                style: const pw.TextStyle(
-                  fontSize: 9,
-                ),
               ),
             ),
-          ));
-          reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.fieldNormals, nextTemplate.units,
-              values, selected, availableWidth, widgets, level + 1);
+          );
+        } else {
+          widgets.add(
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              children: [
+                pw.SizedBox(
+                  child: pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 8.0 * level),
+                    child: pw.Text(
+                      nextTemplate.reportName,
+                      style: const pw.TextStyle(
+                        fontSize: 9,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+          reportTemplateToListViewReceipt(
+            nextTemplate.fieldTypes,
+            nextTemplate.fieldNormals,
+            nextTemplate.units,
+            values,
+            selected,
+            availableWidth,
+            widgets,
+            level + 1,
+          );
         }
       } else {
         // return pw.Container(height: 0);
@@ -401,8 +410,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
   Future<Uint8List> createReport() async {
     Map<String, bool> whichToWrite = <String, bool>{};
     Map<String, bool> whichHeadToWrite = <String, bool>{};
-    List<ReportTemplate> templates =
-        GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
+    List<ReportTemplate> templates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
     // for (ReportTemplate template in templates) {
     //   template.fieldTypes.forEach((key, value) {
     //     if (value == ReportSectionType.subHeading) {
@@ -435,7 +443,6 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     final ByteData logoBytes = await rootBundle.load("assets/logo.png");
     const PdfPageFormat pageFormat = PdfPageFormat.a5;
 
-
     whichToWrite.addAll(widget.patientVisiting.reportsSelected);
     whichToWrite.removeWhere((key, value) => !value);
 
@@ -454,23 +461,18 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     // whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
 
     for (int index = 0; index < whichHeadToWriteKeys.length; index++) {
-      ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values
-          .where((element) => element.id == whichHeadToWriteKeys[index])
-          .first;
+      ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == whichHeadToWriteKeys[index]).first;
       mainWidgets.add(
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-            pw.Text(
-              template.reportName.toUpperCase(),
-              style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-            ),
-          ]
-        ),
+        pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+          pw.Text(
+            template.reportName.toUpperCase(),
+            style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+          ),
+        ]),
       );
 
-      reportTemplateToListViewReceipt(template.fieldTypes, template.fieldNormals, template.units,
-          writtenValues, whichToWrite, pageFormat.availableWidth, mainWidgets);
+      reportTemplateToListViewReceipt(
+          template.fieldTypes, template.fieldNormals, template.units, writtenValues, whichToWrite, pageFormat.availableWidth, mainWidgets);
 
       if (index < whichHeadToWriteKeys.length - 1) {
         mainWidgets.add(pw.Divider(borderStyle: pw.BorderStyle.dotted));
@@ -481,8 +483,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
     pdf.addPage(
       pw.MultiPage(
         pageFormat: pageFormat,
-        margin: pw.EdgeInsets.symmetric(
-            horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
+        margin: pw.EdgeInsets.symmetric(horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
         footer: (context) {
           if (context.pageNumber != context.pagesCount) {
             return pw.Container();
@@ -527,12 +528,15 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                 children: [
                   pw.SizedBox(
                     width: pageFormat.availableWidth * 0.33,
-                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                      pw.Text(
-                        "M. Phil (Histopathologist)",
-                        style: const pw.TextStyle(fontSize: 8),
-                      ),
-                    ]),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Text(
+                          "M. Phil (Histopathologist)",
+                          style: const pw.TextStyle(fontSize: 8),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -647,55 +651,73 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                       ],
                     ),
                     pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                      pw.Text(
-                        "Name: ${_patient.name}",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          "Name: ${_patient.name}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
                         ),
-                      ),
-                    ]),
-                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                      pw.Text(
-                        "Age: ${_patient.age} years / months / days",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "Age: ${_patient.age} years / months / days",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
                         ),
-                      ),
-                    ]),
-                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                      pw.Text(
-                        "Sex: ${_patient.gender}",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "Sex: ${_patient.gender}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
                         ),
-                      ),
-                    ]),
-                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                      pw.Text(
-                        "Lab Number: ${_patient.labNumber}",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "Lab Number: ${_patient.labNumber}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
                         ),
-                      ),
-                    ]),
-                    pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                      pw.Text(
-                        "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
                         ),
-                      ),
-                    ]),
+                      ],
+                    ),
                     _patient.referredBy.isNotEmpty
-                        ? pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                      pw.Text(
-                        "Referred By: ${_patient.referredBy}",
-                        style: const pw.TextStyle(
-                          fontSize: 8,
-                        ),
-                      ),
-                    ])
+                        ? pw.Row(
+                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Text(
+                                "Referred By: ${_patient.referredBy}",
+                                style: const pw.TextStyle(
+                                  fontSize: 8,
+                                ),
+                              ),
+                            ],
+                          )
                         : pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                     pw.SizedBox(height: pageFormat.availableHeight * 0.025),
                     pw.Row(

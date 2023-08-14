@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
@@ -141,9 +140,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             ),
           ),
           const Divider(),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: const [
+            children: [
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text("Search Result:"),
@@ -172,7 +171,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                         ElevatedButton(
                           onPressed: () async {
                             String tempDir = (await getTemporaryDirectory()).path;
-                            File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
+                            File file = File(path.join(tempDir, "${const Uuid().v4()}.pdf"));
                             file.writeAsBytesSync(_reports[index].receiptPdf);
 
                             OpenFile.open(file.path);
@@ -184,7 +183,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                               ? null
                               : () async {
                                   String tempDir = (await getTemporaryDirectory()).path;
-                                  File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
+                                  File file = File(path.join(tempDir, "${const Uuid().v4()}.pdf"));
                                   file.writeAsBytesSync(_reports[index].reportPdf!);
 
                                   OpenFile.open(file.path);
@@ -209,7 +208,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
 
                     String downloadDir = (await getDownloadsDirectory())!.path;
                     File file =
-                        File(path.join(downloadDir, DateFormat("dd-MM-yyyy").format(dateSelected) + "_" + const Uuid().v4() + ".pdf"));
+                        File(path.join(downloadDir, "${DateFormat("dd-MM-yyyy").format(dateSelected)}_${const Uuid().v4()}.pdf"));
                     file.writeAsBytesSync(pdf);
 
                     OpenFile.open(file.path);
