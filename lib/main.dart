@@ -25,11 +25,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final String remotePath = path.join((await getApplicationSupportDirectory()).path, Constants.appDirectoryUnderSupport);
+  if (!Directory(remotePath).existsSync()) {
+    Directory(remotePath).createSync();
+  }
+
   if (!Platform.isAndroid && !Platform.isIOS) {
-    if (!Directory(remotePath).existsSync()) {
-      Directory(remotePath).createSync();
-    }
-    if (!File(path.join(remotePath, Constants.secretFileName)).existsSync()) {
+    if (!File(path.join((await getDownloadsDirectory())!.path, Constants.secretFileName)).existsSync()) {
       File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
         base64Encode(
           utf8.encode("[${DateTime.now().toUtc()}] Cannot open secret file ${File(path.join(remotePath, Constants.secretFileName)).path}"),
