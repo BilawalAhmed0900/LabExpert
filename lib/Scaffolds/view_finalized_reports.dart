@@ -207,8 +207,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                     Uint8List pdf = await generateTheDaysReport(_reports);
 
                     String downloadDir = (await getDownloadsDirectory())!.path;
-                    File file =
-                        File(path.join(downloadDir, "${DateFormat("dd-MM-yyyy").format(dateSelected)}_${const Uuid().v4()}.pdf"));
+                    File file = File(path.join(downloadDir, "${DateFormat("dd-MM-yyyy").format(dateSelected)}_${const Uuid().v4()}.pdf"));
                     file.writeAsBytesSync(pdf);
 
                     OpenFile.open(file.path);
@@ -253,7 +252,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             children: [
               pw.SizedBox(
                 width: pageFormat.availableWidth * 0.30,
-                child: pw.Text(GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).name),
+                child: pw.Text(
+                  "${GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).name} (${GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).id})",
+                ),
               ),
               pw.SizedBox(
                 width: pageFormat.availableWidth * 0.25,
@@ -291,7 +292,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
                   pw.Text(
-                      "Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptPrice).toString().padLeft(5, ' ')}"),
+                    "Total: ${toWrite.fold<int>(0, (previousValue, element) => previousValue + element.receiptPrice).toString().padLeft(5, ' ')}",
+                  ),
                 ],
               ),
               pw.Row(

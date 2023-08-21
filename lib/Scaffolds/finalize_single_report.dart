@@ -4,6 +4,7 @@ import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lab_expert/Constants/constants.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -479,6 +480,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
       }
     }
 
+    final String footerString = await Constants.footerString;
     final pw.Document pdf = pw.Document();
     pdf.addPage(
       pw.MultiPage(
@@ -486,7 +488,12 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
         margin: pw.EdgeInsets.symmetric(horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
         footer: (context) {
           if (context.pageNumber != context.pagesCount) {
-            return pw.Container();
+            return pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              children: [
+                pw.Text(footerString, style: const pw.TextStyle(fontSize: 6,),),
+              ]
+            );
           }
 
           return pw.Column(
@@ -539,6 +546,12 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                     ),
                   ),
                 ],
+              ),
+              pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(footerString, style: const pw.TextStyle(fontSize: 6,),),
+                  ]
               ),
             ],
           );

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -23,8 +24,36 @@ import './Singletons/global_hive_box.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final String remotePath = path.join((await getApplicationSupportDirectory()).path, Constants.appDirectoryUnderSupport);
   if (!Platform.isAndroid && !Platform.isIOS) {
-    if (!File(path.join((await getApplicationDocumentsDirectory()).path, Constants.secretFileName)).existsSync()) {
+    if (!Directory(remotePath).existsSync()) {
+      Directory(remotePath).createSync();
+    }
+    if (!File(path.join(remotePath, Constants.secretFileName)).existsSync()) {
+      File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
+        base64Encode(
+          utf8.encode("[${DateTime.now().toUtc()}] Cannot open secret file ${File(path.join(remotePath, Constants.secretFileName)).path}"),
+        ),
+        mode: FileMode.append,
+        flush: true,
+      );
+      runApp(
+        const MaterialApp(
+          home: Scaffold(
+            body: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("Error has been written to the log"),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      );
       return;
     }
   }
@@ -36,7 +65,7 @@ void main() async {
   // }
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-  await Hive.initFlutter();
+  Hive.init(remotePath);
 
   // const FlutterSecureStorage secureStorage = FlutterSecureStorage();
   //
@@ -52,30 +81,45 @@ void main() async {
   Hive.registerAdapter(ReportSectionTypeAdapter());
   Hive.registerAdapter(PatientVisitingAdapter());
 
-  GlobalHiveBox.adminUserBox = await Hive.openBox<User>(Constants.adminUsersVaultKey,
-      /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+  GlobalHiveBox.adminUserBox = await Hive.openBox<User>(
+    Constants.adminUsersVaultKey, /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/
+  );
 
-  GlobalHiveBox.regularUserBox = await Hive.openBox<User>(Constants.regularUsersVaultKey,
-      /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+  GlobalHiveBox.regularUserBox = await Hive.openBox<User>(
+    Constants.regularUsersVaultKey, /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/
+  );
 
-  GlobalHiveBox.patientsBox = await Hive.openBox<Patient>(Constants.patientVaultKey,
-      /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+  GlobalHiveBox.patientsBox = await Hive.openBox<Patient>(
+    Constants.patientVaultKey, /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/
+  );
 
-  GlobalHiveBox.reportTemplateBox = await Hive.openBox<ReportTemplate>(Constants.reportTemplateVaultKey,
-    /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+  GlobalHiveBox.reportTemplateBox = await Hive.openBox<ReportTemplate>(
+    Constants.reportTemplateVaultKey, /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/
+  );
 
-  GlobalHiveBox.patientReportsBox = await Hive.openLazyBox<PatientVisiting>(Constants.patientReportsVaultKey,
-    /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/);
+  GlobalHiveBox.patientReportsBox = await Hive.openLazyBox<PatientVisiting>(
+    Constants.patientReportsVaultKey, /*encryptionCipher: HiveAesCipher(base64Decode(hiveKey))*/
+  );
 
-  if (GlobalHiveBox.adminUserBox!.isEmpty && GlobalHiveBox.regularUserBox!.isEmpty) {
-    runApp(MaterialApp(
-      home: const RegisterUserScaffold(firstPageNoUser: true, isAdmin: true),
-      theme: ThemeData.dark(),
-    ));
-  } else {
-    runApp(MaterialApp(
-      home: const LoginScaffold(),
-      theme: ThemeData.dark(),
-    ));
+  try {
+    if (GlobalHiveBox.adminUserBox!.isEmpty && GlobalHiveBox.regularUserBox!.isEmpty) {
+      runApp(MaterialApp(
+        home: const RegisterUserScaffold(firstPageNoUser: true, isAdmin: true),
+        theme: ThemeData.dark(),
+      ));
+    } else {
+      runApp(MaterialApp(
+        home: const LoginScaffold(),
+        theme: ThemeData.dark(),
+      ));
+    }
+  } catch (e) {
+    File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
+      base64Encode(
+        utf8.encode("[${DateTime.now().toUtc()}] $e"),
+      ),
+      mode: FileMode.append,
+      flush: true,
+    );
   }
 }
