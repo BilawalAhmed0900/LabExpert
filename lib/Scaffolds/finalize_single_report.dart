@@ -668,6 +668,17 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text(
+                          "M.R. Number: ${_patient.id}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
                           "Name: ${_patient.name}",
                           style: const pw.TextStyle(
                             fontSize: 8,

@@ -16,7 +16,9 @@ class VisitPatientScaffold extends StatefulWidget {
   final int patientId;
   final String username;
 
-  const VisitPatientScaffold({Key? key, required this.patientId, required this.username}) : super(key: key);
+  const VisitPatientScaffold(
+      {Key? key, required this.patientId, required this.username})
+      : super(key: key);
 
   @override
   _VisitPatientScaffoldState createState() => _VisitPatientScaffoldState();
@@ -32,21 +34,29 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   final TextEditingController _discountController = TextEditingController();
   final TextEditingController _searchTestController = TextEditingController();
 
-  final LinkedHashMap<String, bool> _selectedReports = LinkedHashMap<String, bool>();
+  final LinkedHashMap<String, bool> _selectedReports =
+      LinkedHashMap<String, bool>();
 
   String searchingTestName = "";
+
+  DateTime _expectedReportingDate = DateTime.now().toLocal().add(const Duration(days: 1));
 
   @override
   void initState() {
     super.initState();
-    _patient = GlobalHiveBox.patientsBox!.values.where((element) => element.id == widget.patientId).first;
-    _reportTemplates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead == true).toList();
+    _patient = GlobalHiveBox.patientsBox!.values
+        .where((element) => element.id == widget.patientId)
+        .first;
+    _reportTemplates = GlobalHiveBox.reportTemplateBox!.values
+        .where((element) => element.isHead == true)
+        .toList();
   }
 
   void selectAllUnderneath(String id, Map<String, bool> selected) {
     ReportTemplate? template;
     try {
-      template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == id);
+      template = GlobalHiveBox.reportTemplateBox!.values
+          .singleWhere((element) => element.id == id);
     } catch (e) {
       return;
     }
@@ -61,7 +71,10 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   }
 
   ListView reportTemplateToListView(
-      Map<String, ReportSectionType> sectionTypes, Map<String, int> prices, Map<String, bool> selected, String searchingTestName,
+      Map<String, ReportSectionType> sectionTypes,
+      Map<String, int> prices,
+      Map<String, bool> selected,
+      String searchingTestName,
       [int level = 1]) {
     const ScrollPhysics scrollPhysics = ScrollPhysics();
     final ScrollController scrollController = ScrollController();
@@ -74,13 +87,16 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
       ReportTemplate? template;
       try {
-        template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == keyId);
+        template = GlobalHiveBox.reportTemplateBox!.values
+            .singleWhere((element) => element.id == keyId);
       } catch (e) {
         template = null;
       }
 
       if (template == null) return true;
-      return !template.reportName.toLowerCase().contains(searchingTestName.toLowerCase());
+      return !template.reportName
+          .toLowerCase()
+          .contains(searchingTestName.toLowerCase());
     });
 
     return ListView.builder(
@@ -91,7 +107,9 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       itemBuilder: (context, index) {
         ReportTemplate? nextTemplate;
         try {
-          nextTemplate = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+          nextTemplate = GlobalHiveBox.reportTemplateBox!.values
+              .where((element) => element.id == keys[index])
+              .first;
         } catch (e) {
           nextTemplate = null;
         }
@@ -100,7 +118,9 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
           return Container();
         }
 
-        if (sectionTypes[keys[index]] == ReportSectionType.field || sectionTypes[keys[index]] == ReportSectionType.multipleLineComment) {
+        if (sectionTypes[keys[index]] == ReportSectionType.field ||
+            sectionTypes[keys[index]] ==
+                ReportSectionType.multipleLineComment) {
           return Padding(
             padding: EdgeInsets.only(left: 8.0 * level),
             child: Row(
@@ -150,7 +170,12 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ],
               ),
               children: [
-                reportTemplateToListView(nextTemplate.fieldTypes, nextTemplate.prices, selected, searchingTestName, level + 1),
+                reportTemplateToListView(
+                    nextTemplate.fieldTypes,
+                    nextTemplate.prices,
+                    selected,
+                    searchingTestName,
+                    level + 1),
               ],
             ),
           );
@@ -195,6 +220,56 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Expected Reporting Date: "),
+                  SizedBox(
+                    width: screenWidth * 0.65,
+                    child: TextField(
+                      controller: TextEditingController.fromValue(
+                          TextEditingValue(
+                              text: DateFormat("dd-MM-yyyy hh:mm a").format(_expectedReportingDate.toLocal()))),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showDatePicker(
+                        context: context,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        currentDate: _expectedReportingDate,
+                      ).then(
+                        (dateValue) {
+                          if (dateValue != null) {
+                            showTimePicker(
+                                    context: context,
+                                    initialTime:
+                                        TimeOfDay.fromDateTime(dateValue))
+                                .then((timeValue) {
+                              if (timeValue != null) {
+                                setState(() {
+                                  _expectedReportingDate = DateTime(
+                                    dateValue.year,
+                                    dateValue.month,
+                                    dateValue.day,
+                                    timeValue.hour,
+                                    timeValue.minute,
+                                  );
+                                });
+                              }
+                            });
+                          }
+                        },
+                      );
+                    },
+                    child: const Icon(Icons.search),
+                  ),
+                ],
+              ),
+            ),
             const Divider(),
             Expanded(
               child: SingleChildScrollView(
@@ -217,7 +292,9 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                                 Text(_reportTemplates[index].reportName),
                                 ElevatedButton(
                                   onPressed: () {
-                                    selectAllUnderneath(_reportTemplates[index].id, _selectedReports);
+                                    selectAllUnderneath(
+                                        _reportTemplates[index].id,
+                                        _selectedReports);
                                     setState(() {});
                                   },
                                   child: const Text("Select All"),
@@ -226,7 +303,10 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                             ),
                             children: [
                               reportTemplateToListView(
-                                  _reportTemplates[index].fieldTypes, _reportTemplates[index].prices, _selectedReports, searchingTestName),
+                                  _reportTemplates[index].fieldTypes,
+                                  _reportTemplates[index].prices,
+                                  _selectedReports,
+                                  searchingTestName),
                             ],
                           ),
                           // Text(_reportTemplates[index].reportName),
@@ -271,15 +351,23 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ElevatedButton(
                   onPressed: () async {
                     Uint8List receiptPdf = await createReceipt();
-                    await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(_patient.id, _selectedReports, receiptPdf,
-                        DateTime.now().toLocal(), getPrice(), getDiscount(), getPriceWithDiscount()));
+                    await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(
+                        _patient.id,
+                        _selectedReports,
+                        receiptPdf,
+                        DateTime.now().toLocal(),
+                        getPrice(),
+                        getDiscount(),
+                        getPriceWithDiscount()));
 
                     if (context.mounted) {
                       await showDialog(
                         builder: (BuildContext context) {
                           return const AlertDialog(
                             title: Text("Successful"),
-                            content: Text("Operation successful. Please visit the reports tab to continue..."),
+                            content: Text(
+                              "Operation successful. Please visit the reports tab to continue...",
+                            ),
                           );
                         },
                         context: context,
@@ -304,7 +392,10 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     int result = 0;
     _selectedReports.forEach((key, value) {
       if (value) {
-        result += GlobalHiveBox.reportTemplateBox!.values.where((element) => element.prices.containsKey(key)).first.prices[key]!;
+        result += GlobalHiveBox.reportTemplateBox!.values
+            .where((element) => element.prices.containsKey(key))
+            .first
+            .prices[key]!;
       }
     });
     return result;
@@ -327,7 +418,11 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
         result |= _selectedReports[key] ?? false;
       } else if (value == ReportSectionType.subHeading) {
         try {
-          result |= fillWhichToWriteHelper(GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == key).first.fieldTypes);
+          result |= fillWhichToWriteHelper(GlobalHiveBox
+              .reportTemplateBox!.values
+              .where((element) => element.id == key)
+              .first
+              .fieldTypes);
         } catch (_) {
           result |= false;
         }
@@ -341,7 +436,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     ReportTemplate? template;
 
     try {
-      template = GlobalHiveBox.reportTemplateBox!.values.singleWhere((element) => element.id == key);
+      template = GlobalHiveBox.reportTemplateBox!.values
+          .singleWhere((element) => element.id == key);
     } catch (_) {
       template = null;
     }
@@ -357,17 +453,24 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     });
   }
 
-  void reportTemplateToListViewReceipt(Map<String, ReportSectionType> template, Map<String, int> prices, Map<String, bool> selected, List<pw.Widget> widgets,
+  void reportTemplateToListViewReceipt(
+      Map<String, ReportSectionType> template,
+      Map<String, int> prices,
+      Map<String, bool> selected,
+      List<pw.Widget> widgets,
       [int level = 1]) {
     List<String> keys = template.keys.toList();
     keys.removeWhere((element) => !selected.containsKey(element));
     // keys.sort((a, b) => a.compareTo(b));
 
     for (int index = 0; index < keys.length; index++) {
-      ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == keys[index]).first;
+      ReportTemplate nextTemplate = GlobalHiveBox.reportTemplateBox!.values
+          .where((element) => element.id == keys[index])
+          .first;
 
       if (selected.containsKey(keys[index])) {
-        if (template[keys[index]] == ReportSectionType.field || template[keys[index]] == ReportSectionType.multipleLineComment) {
+        if (template[keys[index]] == ReportSectionType.field ||
+            template[keys[index]] == ReportSectionType.multipleLineComment) {
           return widgets.add(pw.Padding(
             padding: pw.EdgeInsets.only(left: 8.0 * level),
             child: pw.Row(
@@ -390,19 +493,16 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
           ));
         } else {
           widgets.add(
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              children: [
-                pw.Text(
-                  nextTemplate.reportName,
-                  style: const pw.TextStyle(
-                    fontSize: 9,
-                  ),
-                ),
-              ]
-            )
-          );
-          reportTemplateToListViewReceipt(nextTemplate.fieldTypes, nextTemplate.prices, selected, widgets, level + 1);
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+            pw.Text(
+              nextTemplate.reportName,
+              style: const pw.TextStyle(
+                fontSize: 9,
+              ),
+            ),
+          ]));
+          reportTemplateToListViewReceipt(nextTemplate.fieldTypes,
+              nextTemplate.prices, selected, widgets, level + 1);
         }
       } else {
         // return pw.Container();
@@ -413,7 +513,9 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
   Future<Uint8List> createReceipt() async {
     Map<String, bool> whichToWrite = <String, bool>{};
     Map<String, bool> whichHeadToWrite = <String, bool>{};
-    List<ReportTemplate> templates = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.isHead).toList();
+    List<ReportTemplate> templates = GlobalHiveBox.reportTemplateBox!.values
+        .where((element) => element.isHead)
+        .toList();
     // for (ReportTemplate template in templates) {
     //   template.fieldTypes.forEach((key, value) {
     //     if (value == ReportSectionType.subHeading) {
@@ -446,7 +548,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     }
 
     final String leftSvg = await rootBundle.loadString("assets/left_logo.svg");
-    final String rightSvg = await rootBundle.loadString("assets/right_logo.svg");
+    final String rightSvg =
+        await rootBundle.loadString("assets/right_logo.svg");
     const PdfPageFormat pageFormat = PdfPageFormat.a5;
 
     whichToWrite.addAll(_selectedReports);
@@ -459,9 +562,12 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     // whichHeadToWriteKeys.sort((a, b) => a.compareTo(b));
 
     for (int index = 0; index < whichHeadToWriteKeys.length; index++) {
-      ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values.where((element) => element.id == whichHeadToWriteKeys[index]).first;
+      ReportTemplate template = GlobalHiveBox.reportTemplateBox!.values
+          .where((element) => element.id == whichHeadToWriteKeys[index])
+          .first;
 
-      mainWidgets.add(pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
+      mainWidgets
+          .add(pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
         pw.Text(
           template.reportName,
           style: const pw.TextStyle(
@@ -470,7 +576,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
         )
       ]));
 
-      reportTemplateToListViewReceipt(template.fieldTypes, template.prices, whichToWrite, mainWidgets);
+      reportTemplateToListViewReceipt(
+          template.fieldTypes, template.prices, whichToWrite, mainWidgets);
 
       if (index < whichHeadToWriteKeys.length - 1) {
         mainWidgets.add(pw.Divider(borderStyle: pw.BorderStyle.dotted));
@@ -481,7 +588,9 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     pdf.addPage(
       pw.MultiPage(
         pageFormat: pageFormat,
-        margin: pw.EdgeInsets.symmetric(horizontal: pageFormat.availableWidth * 0.1, vertical: pageFormat.availableHeight * 0.08),
+        margin: pw.EdgeInsets.symmetric(
+            horizontal: pageFormat.availableWidth * 0.1,
+            vertical: pageFormat.availableHeight * 0.08),
         footer: (context) {
           if (context.pageNumber != context.pagesCount) {
             return pw.Container();
@@ -489,34 +598,39 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
           return pw.Column(
             children: [
-              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                pw.Text(
-                  "Total: ",
-                  style: const pw.TextStyle(
-                    fontSize: 8,
+              pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      "Total: ",
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                    pw.Text(
+                      getPrice().toString(),
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                  ]),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "Discount: ",
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
                   ),
-                ),
-                pw.Text(
-                  getPrice().toString(),
-                  style: const pw.TextStyle(
-                    fontSize: 8,
+                  pw.Text(
+                    getDiscount().toString(),
+                    style: const pw.TextStyle(
+                      fontSize: 8,
+                    ),
                   ),
-                ),
-              ]),
-              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-                pw.Text(
-                  "Discount: ",
-                  style: const pw.TextStyle(
-                    fontSize: 8,
-                  ),
-                ),
-                pw.Text(
-                  getDiscount().toString(),
-                  style: const pw.TextStyle(
-                    fontSize: 8,
-                  ),
-                ),
-              ]),
+                ],
+              ),
               pw.Divider(borderStyle: pw.BorderStyle.dotted),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -619,8 +733,12 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.SvgImage(svg: leftSvg, height: pageFormat.availableHeight * 0.125),
-                    pw.SvgImage(svg: rightSvg, height: pageFormat.availableHeight * 0.15),
+                    pw.SvgImage(
+                        svg: leftSvg,
+                        height: pageFormat.availableHeight * 0.125),
+                    pw.SvgImage(
+                        svg: rightSvg,
+                        height: pageFormat.availableHeight * 0.15),
                   ],
                 ),
                 pw.Row(
@@ -635,31 +753,51 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                   ],
                 ),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text(
-                    "Name: ${_patient.name}",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Name: ${_patient.name}",
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
                     ),
-                  ),
-                ]),
-                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text(
-                    "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
+                  ],
+                ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(DateTime.now().toLocal())}",
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Expected Reporting Date: ${DateFormat("dd-MM-yyyy hh:mm a").format(_expectedReportingDate)}",
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                  ],
+                ),
                 pw.SizedBox(height: pageFormat.availableHeight * 0.025),
-                pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-                  pw.Text(
-                    "Receipt Details:",
-                    style: const pw.TextStyle(
-                      fontSize: 8,
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Receipt Details:",
+                      style: const pw.TextStyle(
+                        fontSize: 8,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 pw.Divider(borderStyle: pw.BorderStyle.dotted),
                 ...mainWidgets,
               ],
