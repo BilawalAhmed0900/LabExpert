@@ -34,7 +34,7 @@ class _ChangePasswordScaffoldState extends State<ChangePasswordScaffold> {
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });
@@ -45,7 +45,7 @@ class _ChangePasswordScaffoldState extends State<ChangePasswordScaffold> {
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });

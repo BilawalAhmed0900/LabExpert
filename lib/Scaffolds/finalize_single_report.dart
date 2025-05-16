@@ -168,7 +168,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 880));
         }
       });
@@ -181,7 +181,7 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });

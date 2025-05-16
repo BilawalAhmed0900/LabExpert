@@ -81,7 +81,7 @@ class _FinalizeReportsScaffoldState extends State<FinalizeReportsScaffold> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   String tempDir = (await getTemporaryDirectory()).path;
-                                  File file = File(path.join(tempDir, const Uuid().v4() + ".pdf"));
+                                  File file = File(path.join(tempDir, "${const Uuid().v4()}.pdf"));
                                   file.writeAsBytesSync(nonFinalizedReports[index].receiptPdf);
 
                                   OpenFile.open(file.path);

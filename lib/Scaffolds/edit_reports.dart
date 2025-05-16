@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:desktop_window/desktop_window.dart';
@@ -33,7 +32,7 @@ class _EditReportsLayoutState extends State<EditReportsLayout> {
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });
@@ -211,7 +210,7 @@ class _EditReportsLayoutState extends State<EditReportsLayout> {
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });

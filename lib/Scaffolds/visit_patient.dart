@@ -39,7 +39,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
 
   String searchingTestName = "";
 
-  DateTime _expectedReportingDate = DateTime.now().toLocal().add(const Duration(days: 1));
+  DateTime _expectedReportingDate =
+      DateTime.now().toLocal().add(const Duration(days: 1));
 
   @override
   void initState() {
@@ -231,7 +232,8 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                     child: TextField(
                       controller: TextEditingController.fromValue(
                           TextEditingValue(
-                              text: DateFormat("dd-MM-yyyy hh:mm a").format(_expectedReportingDate.toLocal()))),
+                              text: DateFormat("dd-MM-yyyy hh:mm a")
+                                  .format(_expectedReportingDate.toLocal()))),
                     ),
                   ),
                   TextButton(
@@ -471,7 +473,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
       if (selected.containsKey(keys[index])) {
         if (template[keys[index]] == ReportSectionType.field ||
             template[keys[index]] == ReportSectionType.multipleLineComment) {
-          return widgets.add(pw.Padding(
+          widgets.add(pw.Padding(
             padding: pw.EdgeInsets.only(left: 8.0 * level),
             child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -492,15 +494,18 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
             ),
           ));
         } else {
-          widgets.add(
-              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.start, children: [
-            pw.Text(
-              nextTemplate.reportName,
-              style: const pw.TextStyle(
-                fontSize: 9,
-              ),
-            ),
-          ]));
+          widgets.add(pw.Padding(
+              padding: pw.EdgeInsets.only(left: 8.0 * level),
+              child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      nextTemplate.reportName,
+                      style: const pw.TextStyle(
+                        fontSize: 9,
+                      ),
+                    ),
+                  ])));
           reportTemplateToListViewReceipt(nextTemplate.fieldTypes,
               nextTemplate.prices, selected, widgets, level + 1);
         }

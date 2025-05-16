@@ -37,7 +37,7 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(820, 980));
         }
       });
@@ -53,7 +53,7 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });

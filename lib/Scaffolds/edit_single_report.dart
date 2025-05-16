@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:desktop_window/desktop_window.dart';
@@ -37,7 +36,7 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });
@@ -48,7 +47,7 @@ class _ReportEditingScaffoldState extends State<ReportEditingScaffold> {
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });

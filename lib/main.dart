@@ -7,7 +7,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:path/path.dart' as path;
 
-import 'package:desktop_window/desktop_window.dart';
 import 'package:path_provider/path_provider.dart';
 import './HiveEntities/patient.dart';
 import './HiveEntities/patient_visiting.dart';
@@ -115,6 +114,7 @@ void main() async {
       ));
     }
   } catch (e) {
+    print(e);
     File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
       base64Encode(
         utf8.encode("[${DateTime.now().toUtc()}] $e"),

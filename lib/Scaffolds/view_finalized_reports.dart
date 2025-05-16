@@ -40,12 +40,15 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
   Future<void> getReportsCurrentDate() async {
     _reports.clear();
     for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
+      print("Getting patient at index: $i from ${GlobalHiveBox.patientReportsBox!.length}");
       PatientVisiting patientVisiting = (await GlobalHiveBox.patientReportsBox!.getAt(i))!;
+      print("Comparing time of report patient: ${patientVisiting.receiptTime} to select: $dateSelected");
       if (isSameDate(patientVisiting.receiptTime, dateSelected)) {
         _reports.add(patientVisiting);
       }
     }
 
+    print("Got patient from ${GlobalHiveBox.patientReportsBox!.length}, length: ${_reports.length}");
     _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
     setState(() {});
   }
@@ -59,7 +62,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 880));
         }
       });
@@ -70,7 +73,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
   void dispose() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       DesktopWindow.getFullScreen().then((value) {
-        if (!(value as bool)) {
+        if (!(value)) {
           DesktopWindow.setWindowSize(const Size(720, 505));
         }
       });
@@ -136,6 +139,14 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                   },
                   child: const Icon(Icons.search),
                 ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+
+                    });
+                  },
+                  child: const Icon(Icons.refresh),
+                ),
               ],
             ),
           ),
@@ -157,6 +168,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 physics: _scrollPhysics,
                 itemCount: _reports.length,
                 itemBuilder: (context, index) {
+                  print("Making row at index: $index");
                   Patient patient = GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == _reports[index].patientId);
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
