@@ -1,11 +1,16 @@
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lab_expert/HiveEntities/patient_visiting.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:uuid/uuid.dart';
 
 import '../HiveEntities/patient.dart';
 import '../HiveEntities/report_section_type.dart';
@@ -353,6 +358,7 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
                 ElevatedButton(
                   onPressed: () async {
                     Uint8List receiptPdf = await createReceipt();
+                    await generateEmlAndOpen(_patient, receiptPdf);
                     await GlobalHiveBox.patientReportsBox!.add(PatientVisiting(
                         _patient.id,
                         _selectedReports,
@@ -813,5 +819,58 @@ class _VisitPatientScaffoldState extends State<VisitPatientScaffold> {
     );
 
     return await pdf.save();
+  }
+
+  Future<void> generateEmlAndOpen(Patient patient, Uint8List pdfFile) async {
+    Map<String, String> env;
+    try {
+      final String envFile = path.join(File(Platform.resolvedExecutable).parent.path, 'config.env');
+      final String envEntries = (await File(envFile).readAsString()).replaceAll("\r\n", "\n");
+      env = Map.fromEntries(envEntries.split("\n").map((String line){ List<String> splitted = line.split("="); return MapEntry(splitted.first, splitted.last); }));
+    } catch (e) {
+      return;
+    }
+
+    if (int.parse(env["send_email"] ?? "0") == 0) {
+      return;
+    }
+
+    final String subject =
+      env['subject']?.replaceAll("\${patient_name}", patient.name).replaceAll("\${date}", DateFormat("yyyyMMddTHHmmSS").format(DateTime.now())).replaceAll(" ", "-").toLowerCase()
+      ?? Uuid().v4();
+
+    final String? recipient = env['recipient'];
+    if (recipient == null) {
+      return;
+    }
+
+    final String emlFile =
+'''
+To: $recipient
+Subject: $subject
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="sep"
+
+--sep
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+--sep
+Content-Type: application/octet-stream; name="$subject.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="$subject.pdf"
+
+${base64Encode(pdfFile)}
+--sep--
+''';
+
+    final File file = File(path.join((await getTemporaryDirectory()).path, "$subject.eml"));
+    await file.writeAsString(emlFile);
+
+    if (Platform.isWindows) {
+      Process.run('start', [file.path], runInShell: true);
+    } else if (Platform.isLinux) {
+      Process.run('xdg-open', [file.path]);
+    }
   }
 }
