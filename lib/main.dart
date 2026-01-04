@@ -31,9 +31,9 @@ void main() async {
   if (!Platform.isAndroid && !Platform.isIOS) {
     if (!File(path.join((await getDownloadsDirectory())!.path, Constants.secretFileName)).existsSync()) {
       File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
-        base64Encode(
-          utf8.encode("[${DateTime.now().toUtc()}] Cannot open secret file ${File(path.join(remotePath, Constants.secretFileName)).path}"),
-        ),
+        "\n${base64Encode(
+          utf8.encode("[${DateTime.now().toUtc()}] Cannot open secret file ${File(path.join((await getDownloadsDirectory())!.path, Constants.secretFileName)).path}"),
+        )}",
         mode: FileMode.append,
         flush: true,
       );
@@ -114,11 +114,10 @@ void main() async {
       ));
     }
   } catch (e) {
-    print(e);
     File(path.join((await getApplicationDocumentsDirectory()).path, Constants.logFileName)).writeAsStringSync(
-      base64Encode(
+      "\n${base64Encode(
         utf8.encode("[${DateTime.now().toUtc()}] $e"),
-      ),
+      )}",
       mode: FileMode.append,
       flush: true,
     );
