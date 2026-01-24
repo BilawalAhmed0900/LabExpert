@@ -44,5 +44,24 @@ namespace LabExpert
             using (var cmd = new SQLiteCommand(sqlUsers, connection))
                 cmd.ExecuteNonQuery();
         }
+
+        public bool AtLeastOneUserRegistered
+        {
+            get
+            {
+                string sqlSelect = @"
+                    SELECT COUNT(*) FROM Users;
+                ";
+                using (var cmd = new SQLiteCommand(sqlSelect, connection))
+                {
+                    long count = (long)cmd.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
     }
 }

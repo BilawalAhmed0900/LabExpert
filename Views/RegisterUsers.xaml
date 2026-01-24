@@ -1,0 +1,34 @@
+﻿<Page x:Class="LabExpert.Views.RegisterUsers"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:LabExpert.Views"
+      Height="270" Width="480"
+      Title="RegisterUsers">
+
+    <Grid>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Row 1: Username -->
+            <Label Grid.Row="0" Grid.Column="0" Content="Username:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="UsernameBox" Margin="0,0,0,10" Width="200"/>
+
+            <!-- Row 2: Password -->
+            <Label Grid.Row="1" Grid.Column="0" Content="Password:" VerticalAlignment="Center" Margin="0,0,10,10"/>
+            <PasswordBox Grid.Row="1" Grid.Column="1" x:Name="PasswordBox" Margin="0,0,0,10" Width="200"/>
+
+            <!-- Row 3: Button aligned right -->
+            <Button Grid.Row="2" Grid.Column="1" Content="Register" Width="100" HorizontalAlignment="Right" Click="RegisterUser"/>
+        </Grid>
+    </Grid>
+</Page>
