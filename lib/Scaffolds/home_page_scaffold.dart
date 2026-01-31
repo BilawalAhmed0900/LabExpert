@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lab_expert/HiveEntities/report_template.dart';
 import 'package:lab_expert/Scaffolds/change_password.dart';
@@ -12,15 +14,56 @@ import '../Scaffolds/add_patient.dart';
 import '../Scaffolds/login_scaffold.dart';
 import '../Scaffolds/register_user_scaffold.dart';
 
-class HomePageScaffold extends StatelessWidget {
+import 'package:path/path.dart' as path;
+
+class HomePageScaffold extends StatefulWidget {
   final bool isAdmin;
   final String username;
   final String sha256;
+  bool isReceiptOnly = false;
+  bool isReady = false;
 
-  const HomePageScaffold({Key? key, required this.isAdmin, required this.username, required this.sha256}) : super(key: key);
+  HomePageScaffold({Key? key, required this.isAdmin, required this.username, required this.sha256}) : super(key: key);
+
+  @override
+  State<HomePageScaffold> createState() => _HomePageScaffoldState();
+}
+
+class _HomePageScaffoldState extends State<HomePageScaffold> {
+  @override
+  void initState() {
+    super.initState();
+    final String envFile = path.join(File(Platform.resolvedExecutable).parent.path, 'config.env');
+    (File(envFile).readAsString()).then((envEntries) {
+      Map<String, String> env;
+      envEntries = envEntries.replaceAll("\r\n", "\n");
+      env = Map.fromEntries(envEntries.split("\n").map((String line){ List<String> splitted = line.split("="); return MapEntry(splitted.first, splitted.last); }));
+
+      if (int.parse(env["receipt_only"] ?? "0") == 0) {
+        setState(() {
+          widget.isReady = true;
+        });
+        return;
+      }
+
+      setState(() {
+        widget.isReady = true;
+        widget.isReceiptOnly = true;
+      });
+    }).onError((error, trace) {
+      setState(() {
+        widget.isReady = true;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.isReady) {
+      return Scaffold(
+        body: Container(),
+      );
+    }
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
@@ -28,7 +71,7 @@ class HomePageScaffold extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
-              mainAxisAlignment: (isAdmin) ? MainAxisAlignment.spaceAround : MainAxisAlignment.center,
+              mainAxisAlignment: (widget.isAdmin) ? MainAxisAlignment.spaceAround : MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
@@ -38,7 +81,7 @@ class HomePageScaffold extends StatelessWidget {
                   },
                   child: const Text("Add Patient"),
                 ),
-                (isAdmin)
+                (widget.isAdmin)
                     ? ElevatedButton(
                         onPressed: () {
                           _addUser(context);
@@ -46,7 +89,7 @@ class HomePageScaffold extends StatelessWidget {
                         child: const Text("Add Users"),
                       )
                     : Container(),
-                (isAdmin)
+                (widget.isAdmin)
                     ? ElevatedButton(
                         onPressed: () {
                           _customizeReportLayout(context);
@@ -66,7 +109,7 @@ class HomePageScaffold extends StatelessWidget {
                   child: const Text("Search Patient"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: widget.isReceiptOnly ? null : () {
                     _finalizeReports(context);
                   },
                   child: const Text("Finalize Reports"),
@@ -85,7 +128,7 @@ class HomePageScaffold extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                      return ChangePasswordScaffold(username: username, oldSha256: sha256, isAdmin: isAdmin,);
+                      return ChangePasswordScaffold(username: widget.username, oldSha256: widget.sha256, isAdmin: widget.isAdmin,);
                     }));
                   },
                   child: const Text("Change Password"),
@@ -115,7 +158,7 @@ class HomePageScaffold extends StatelessWidget {
   void _addUser(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return RegisterUserScaffold(firstPageNoUser: false, isAdmin: isAdmin,);
+        return RegisterUserScaffold(firstPageNoUser: false, isAdmin: widget.isAdmin,);
       }),
     );
   }
@@ -148,7 +191,7 @@ class HomePageScaffold extends StatelessWidget {
   void _searchPatient(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return SearchPatientScaffold(username: username,);
+        return SearchPatientScaffold(username: widget.username,);
       }),
     );
   }
@@ -156,7 +199,7 @@ class HomePageScaffold extends StatelessWidget {
   void _finalizeReports(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return FinalizeReportsScaffold(username: username,);
+        return FinalizeReportsScaffold(username: widget.username,);
       }),
     );
   }
@@ -164,7 +207,7 @@ class HomePageScaffold extends StatelessWidget {
   void _viewFinalizeReports(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) {
-        return ViewFinalizedReportsScaffold(username: username,);
+        return ViewFinalizedReportsScaffold(username: widget.username,);
       }),
     );
   }

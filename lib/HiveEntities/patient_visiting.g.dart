@@ -16,8 +16,6 @@ class PatientVisitingAdapter extends TypeAdapter<PatientVisiting> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-
-
     return PatientVisiting(
       fields[0] as int,
       (fields[1] as Map).cast<String, bool>(),

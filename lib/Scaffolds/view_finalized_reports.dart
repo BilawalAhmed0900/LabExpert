@@ -40,15 +40,15 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
   Future<void> getReportsCurrentDate() async {
     _reports.clear();
     for (int i = 0; i < GlobalHiveBox.patientReportsBox!.length; i++) {
-      print("Getting patient at index: $i from ${GlobalHiveBox.patientReportsBox!.length}");
+      // print("Getting patient at index: $i from ${GlobalHiveBox.patientReportsBox!.length}");
       PatientVisiting patientVisiting = (await GlobalHiveBox.patientReportsBox!.getAt(i))!;
-      print("Comparing time of report patient: ${patientVisiting.receiptTime} to select: $dateSelected");
+      // print("Comparing time of report patient: ${patientVisiting.receiptTime} to select: $dateSelected");
       if (isSameDate(patientVisiting.receiptTime, dateSelected)) {
         _reports.add(patientVisiting);
       }
     }
 
-    print("Got patient from ${GlobalHiveBox.patientReportsBox!.length}, length: ${_reports.length}");
+    // print("Got patient from ${GlobalHiveBox.patientReportsBox!.length}, length: ${_reports.length}");
     _reports.sort((a, b) => b.receiptTime.compareTo(a.receiptTime));
     setState(() {});
   }
@@ -168,7 +168,7 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 physics: _scrollPhysics,
                 itemCount: _reports.length,
                 itemBuilder: (context, index) {
-                  print("Making row at index: $index");
+                  // print("Making row at index: $index");
                   Patient patient = GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == _reports[index].patientId);
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -254,6 +254,29 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
     final String rightSvg = await rootBundle.loadString("assets/right_logo.svg");
     const PdfPageFormat pageFormat = PdfPageFormat.a4;
 
+    toWrite.sort((PatientVisiting lhs, PatientVisiting rhs) {
+      Patient? lhsPatient = GlobalHiveBox.patientsBox?.values.firstWhere((patient) => patient.id == lhs.patientId);
+      Patient? rhsPatient = GlobalHiveBox.patientsBox?.values.firstWhere((patient) => patient.id == rhs.patientId);
+
+      if (lhsPatient == null || rhsPatient == null) {
+        return 0;
+      }
+
+      int firstCompare = lhsPatient.labNumber.compareTo(rhsPatient.labNumber);
+      if (firstCompare == 0) {
+        return lhs.receiptTime.compareTo(rhs.receiptTime);
+      }
+      return firstCompare;
+    });
+
+    List<Patient?> toWritePatients = toWrite.map((PatientVisiting pv) {
+      try {
+        return GlobalHiveBox.patientsBox?.values.firstWhere((patient) => patient.id == pv.patientId);
+      } catch (e) {
+        return null;
+      }
+    }).toList();
+
     List<pw.Widget> mainWidgets = [];
     for (int index = 0; index < toWrite.length; index++) {
       mainWidgets.add(
@@ -263,9 +286,9 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.SizedBox(
-                width: pageFormat.availableWidth * 0.30,
+                width: pageFormat.availableWidth * 0.425,
                 child: pw.Text(
-                  "${GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).name} (${GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).id})",
+                  "${GlobalHiveBox.patientsBox!.values.singleWhere((element) => element.id == toWrite[index].patientId).name} ${toWritePatients[index]?.id}/${toWritePatients[index]?.labNumber}",
                 ),
               ),
               pw.SizedBox(
@@ -279,8 +302,8 @@ class _ViewFinalizedReportsScaffoldState extends State<ViewFinalizedReportsScaff
                 ),
               ),
               pw.SizedBox(
-                width: pageFormat.availableWidth * 0.2,
-                child: pw.Text(toWrite[index].reportPdf == null ? "Not Finalized" : "Finalized"),
+                width: pageFormat.availableWidth * 0.075,
+                child: pw.Text(toWrite[index].reportPdf == null ? "NF" : "F"),
               ),
             ],
           ),

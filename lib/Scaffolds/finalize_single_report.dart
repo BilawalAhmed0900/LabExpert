@@ -499,54 +499,8 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
           return pw.Column(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
-                children: [
-                  pw.SizedBox(
-                    width: pageFormat.availableWidth * 0.33,
-                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                      pw.Text(
-                        "Pathologist",
-                        style: pw.TextStyle(
-                          decoration: pw.TextDecoration.underline,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                    ]),
-                  ),
-                ],
-              ),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
-                children: [
-                  pw.SizedBox(
-                    width: pageFormat.availableWidth * 0.33,
-                    child: pw.Row(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-                      pw.Text(
-                        "Dr. Yousaf Mushtaq",
-                        style: const pw.TextStyle(fontSize: 8),
-                      ),
-                    ]),
-                  ),
-                ],
-              ),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
-                children: [
-                  pw.SizedBox(
-                    width: pageFormat.availableWidth * 0.33,
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
-                      children: [
-                        pw.Text(
-                          "M. Phil (Histopathologist)",
-                          style: const pw.TextStyle(fontSize: 8),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              pw.Text("Computer Generated Report. No Signature Required", style: const pw.TextStyle(fontSize: 8,),),
+              pw.SizedBox(height: 4),
               pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   children: [
@@ -702,6 +656,17 @@ class _FinalizeSingleReportScaffoldState extends State<FinalizeSingleReportScaff
                       children: [
                         pw.Text(
                           "Sex: ${_patient.gender}",
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "Phone Number: ${_patient.phoneNumber}",
                           style: const pw.TextStyle(
                             fontSize: 8,
                           ),

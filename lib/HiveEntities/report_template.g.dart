@@ -23,7 +23,6 @@ class ReportTemplateAdapter extends TypeAdapter<ReportTemplate> {
       (fields[3] as Map).cast<String, String>(),
       (fields[4] as Map).cast<String, int>(),
       (fields[5] as Map).cast<String, String>(),
-
       fields[6] as bool,
     );
   }

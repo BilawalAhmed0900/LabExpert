@@ -26,6 +26,7 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController labNumberController = TextEditingController();
   final TextEditingController referredByController = TextEditingController();
@@ -86,6 +87,7 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
                       Text("Name: "),
                       Text("Gender: "),
                       Text("Age: "),
+                      Text("Phone Number: "),
                       Text("Sample: "),
                       Text("Lab Number: "),
                       Text("Date Added: "),
@@ -131,6 +133,15 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
                           textAlign: TextAlign.right,
                           keyboardType: TextInputType.number,
                           controller: ageController,
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * 0.75,
+                        child: TextField(
+                          maxLength: 32,
+                          textAlign: TextAlign.right,
+                          keyboardType: TextInputType.phone,
+                          controller: phoneNumberController,
                         ),
                       ),
                       SizedBox(
@@ -325,11 +336,33 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
 
   void _addPatient(BuildContext context) async {
     try {
+      if (nameController.text.isEmpty) {
+        throw Exception("Name cannot be empty");
+      }
+      if (ageController.text.isEmpty) {
+        throw Exception("Age cannot be empty");
+      }
+      if (int.tryParse(ageController.text) == null) {
+        throw Exception("Age must be a number");
+      }
+      if (genderController.text.isEmpty) {
+        throw Exception("Gender cannot be empty");
+      }
+      if (phoneNumberController.text.isEmpty) {
+        throw Exception("Phone number cannot be empty");
+      }
+      if (labNumberController.text.isEmpty) {
+        throw Exception("Lab Number cannot be empty");
+      }
+      if (int.tryParse(labNumberController.text) == null) {
+        throw Exception("Lab Number must be a number");
+      }
       Patient patient = Patient(
           int.parse(idController.text),
           nameController.text,
           int.parse(ageController.text),
           genderController.text,
+          phoneNumberController.text,
           int.parse(labNumberController.text),
           referredByController.text,
           sampleController.text,
@@ -347,7 +380,9 @@ class _AddPatientScaffoldState extends State<AddPatientScaffold> {
         dateAddedController.text = DateFormat(dateFormat).format(currentDT);
       });
     } catch (e) {
-      showAlertBox(context, "Invalid Input", e.toString());
+      if (context.mounted) {
+        await showAlertBox(context, "Invalid Input", e.toString());
+      }
     }
   }
 }
